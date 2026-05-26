@@ -25,7 +25,7 @@ export const personalDetails = {
   shortIntro: "I am a results-driven MERN Stack Developer with hands-on experience building real-time and AI-powered web applications, committed to delivering high-performance, scalable solutions.",
   socials: {
     github: "https://github.com/harshx-2005",
-    linkedin: "www.linkedin.com/in/harsh-kshirsagar-975699338",
+    linkedin: "https://www.linkedin.com/in/harsh-kshirsagar-975699338/",
     twitter: "https://twitter.com",
     email: "theharshkshirsagar@gmail.com",
     phone: "+91-7058412735"
@@ -102,7 +102,7 @@ export const projectsData = [
       "Complete Admin Dashboard for chat channel moderation"
     ],
     github: "https://github.com/harshx-2005/linkup",
-    liveDemo: "linkup-silk.vercel.app",
+    liveDemo: "https://linkup-silk.vercel.app",
     bannerBg: "from-blue-600 via-indigo-600 to-indigo-800",
     glowColor: "rgba(59, 130, 246, 0.4)"
   },
