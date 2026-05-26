@@ -1,4 +1,5 @@
-import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope } from 'react-icons/fa';
+import { useState } from 'react';
+import { FaGithub, FaLinkedin, FaInstagram, FaDiscord, FaEnvelope, FaCheck } from 'react-icons/fa';
 import { personalDetails } from '../constants/portfolioData';
 
 const NAV_LINKS = [
@@ -13,6 +14,14 @@ const NAV_LINKS = [
 ];
 
 export default function Footer() {
+  const [copiedDiscord, setCopiedDiscord] = useState(false);
+
+  const copyDiscord = () => {
+    navigator.clipboard.writeText(personalDetails.socials.discord);
+    setCopiedDiscord(true);
+    setTimeout(() => setCopiedDiscord(false), 2000);
+  };
+
   const handleScrollTo = (e, id) => {
     e.preventDefault();
     const el = document.getElementById(id);
@@ -92,14 +101,30 @@ export default function Footer() {
             <FaLinkedin className="w-4 h-4" />
           </a>
           <a 
-            href={personalDetails.socials.twitter} 
+            href={personalDetails.socials.instagram} 
             target="_blank" 
             rel="noreferrer" 
-            className="w-9 h-9 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-sky-400 hover:border-sky-500/20 transition-all duration-300"
-            aria-label="Twitter"
+            className="w-9 h-9 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-pink-400 hover:border-pink-500/20 transition-all duration-300"
+            aria-label="Instagram"
           >
-            <FaTwitter className="w-4 h-4" />
+            <FaInstagram className="w-4 h-4" />
           </a>
+          
+          <div className="relative">
+            <button 
+              onClick={copyDiscord}
+              className="w-9 h-9 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-indigo-400 hover:border-indigo-500/20 transition-all duration-300 cursor-pointer"
+              aria-label="Copy Discord username"
+            >
+              {copiedDiscord ? <FaCheck className="w-4 h-4 text-emerald-400" /> : <FaDiscord className="w-4 h-4" />}
+            </button>
+            
+            {copiedDiscord && (
+              <span className="absolute bottom-12 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded bg-slate-900 border border-indigo-500/30 text-white font-mono-tech text-[9px] font-bold whitespace-nowrap shadow-lg z-50 pointer-events-none">
+                Copied!
+              </span>
+            )}
+          </div>
           <a 
             href={`mailto:${personalDetails.socials.email}`}
             className="w-9 h-9 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-pink-400 hover:border-pink-500/20 transition-all duration-300"

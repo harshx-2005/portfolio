@@ -26,7 +26,8 @@ export const personalDetails = {
   socials: {
     github: "https://github.com/harshx-2005",
     linkedin: "https://www.linkedin.com/in/harsh-kshirsagar-975699338/",
-    twitter: "https://twitter.com",
+    instagram: "https://www.instagram.com/_paradoxx_og_?igsh=bDl6cGR5Z240eXY1",
+    discord: "king_ragnar_lothbrok_",
     email: "theharshkshirsagar@gmail.com",
     phone: "+91-7058412735"
   }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPaperPlane, FaCopy, FaCheck, FaMapMarkerAlt, FaEnvelope, FaGithub, FaLinkedin, FaTwitter, FaPhoneAlt } from 'react-icons/fa';
+import { FaPaperPlane, FaCopy, FaCheck, FaMapMarkerAlt, FaEnvelope, FaGithub, FaLinkedin, FaInstagram, FaDiscord, FaPhoneAlt } from 'react-icons/fa';
 import { personalDetails } from '../constants/portfolioData';
 
 const FORMSPREE_FORM_ID = "https://formspree.io/f/mpqnyqrw"; // Replace with your actual Formspree form ID
@@ -14,6 +14,7 @@ export default function Contact() {
   const [showToast, setShowToast] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
+  const [copiedDiscord, setCopiedDiscord] = useState(false);
 
   const triggerToast = (msg) => {
     setToastMessage(msg);
@@ -35,6 +36,13 @@ export default function Contact() {
     setCopiedPhone(true);
     triggerToast("Phone number copied to clipboard!");
     setTimeout(() => setCopiedPhone(false), 2000);
+  };
+
+  const copyDiscord = () => {
+    navigator.clipboard.writeText(personalDetails.socials.discord);
+    setCopiedDiscord(true);
+    triggerToast("Discord username copied to clipboard!");
+    setTimeout(() => setCopiedDiscord(false), 2000);
   };
 
   const validate = () => {
@@ -205,13 +213,21 @@ export default function Contact() {
                 <FaLinkedin className="w-5 h-5" />
               </a>
               <a 
-                href={personalDetails.socials.twitter} 
+                href={personalDetails.socials.instagram} 
                 target="_blank" 
                 rel="noreferrer" 
-                className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-sky-400 hover:border-sky-500/20 transition-all duration-300"
+                className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-pink-400 hover:border-pink-500/20 transition-all duration-300"
+                aria-label="Instagram"
               >
-                <FaTwitter className="w-5 h-5" />
+                <FaInstagram className="w-5 h-5" />
               </a>
+              <button 
+                onClick={copyDiscord}
+                className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-indigo-400 hover:border-indigo-500/20 transition-all duration-300 cursor-pointer"
+                aria-label="Copy Discord username"
+              >
+                {copiedDiscord ? <FaCheck className="w-4 h-4 text-emerald-400" /> : <FaDiscord className="w-5 h-5" />}
+              </button>
             </div>
           </div>
 

@@ -1,11 +1,14 @@
-import { motion } from 'framer-motion';
-import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope, FaChevronDown } from 'react-icons/fa';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaGithub, FaLinkedin, FaInstagram, FaDiscord, FaEnvelope, FaChevronDown, FaCheck } from 'react-icons/fa';
 import { BiBriefcase, BiDownload } from 'react-icons/bi';
 import { personalDetails } from '../constants/portfolioData';
 import TypingEffect from '../components/TypingEffect';
 import TechMarquee from '../components/TechMarquee';
 
 export default function Hero() {
+  const [copiedDiscord, setCopiedDiscord] = useState(false);
+
   const handleScrollTo = (id) => {
     const el = document.getElementById(id);
     if (el) {
@@ -20,6 +23,12 @@ export default function Hero() {
         behavior: 'smooth'
       });
     }
+  };
+
+  const copyDiscord = () => {
+    navigator.clipboard.writeText(personalDetails.socials.discord);
+    setCopiedDiscord(true);
+    setTimeout(() => setCopiedDiscord(false), 2000);
   };
 
   return (
@@ -114,15 +123,40 @@ export default function Hero() {
             >
               <FaLinkedin className="w-5 h-5" />
             </a>
-            <a 
-              href={personalDetails.socials.twitter} 
+             <a 
+              href={personalDetails.socials.instagram} 
               target="_blank" 
               rel="noreferrer" 
-              className="w-11 h-11 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-sky-400 hover:border-sky-500/20 hover:scale-108 hover:shadow-[0_0_15px_rgba(56,189,248,0.2)] transition-all duration-300"
-              aria-label="Twitter/X"
+              className="w-11 h-11 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-pink-400 hover:border-pink-500/20 hover:scale-108 hover:shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all duration-300"
+              aria-label="Instagram"
             >
-              <FaTwitter className="w-5 h-5" />
+              <FaInstagram className="w-5 h-5" />
             </a>
+            
+            <div className="relative">
+              <button 
+                onClick={copyDiscord}
+                className="w-11 h-11 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-indigo-400 hover:border-indigo-500/20 hover:scale-108 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all duration-300 cursor-pointer"
+                aria-label="Copy Discord username"
+              >
+                {copiedDiscord ? <FaCheck className="w-5 h-5 text-emerald-400" /> : <FaDiscord className="w-5 h-5" />}
+              </button>
+              
+              <AnimatePresence>
+                {copiedDiscord && (
+                  <motion.span 
+                    className="absolute bottom-14 left-1/2 transform -translate-x-1/2 px-3 py-1.5 rounded-lg bg-slate-900 border border-indigo-500/30 text-white font-mono-tech text-[10px] font-bold whitespace-nowrap shadow-lg z-50 pointer-events-none"
+                    initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.8 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Discord Copied!
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+
             <a 
               href={`mailto:${personalDetails.socials.email}`}
               className="w-11 h-11 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-pink-400 hover:border-pink-500/20 hover:scale-108 hover:shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all duration-300"
