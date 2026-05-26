@@ -1,0 +1,94 @@
+======================================================================
+HARSH MAHESH KSHIRSAGAR
+MERN Stack Developer | Full Stack Developer | Django Developer | Software Tester
+Location: Akluj, Solapur, India
+Email: theharshkshirsagar@gmail.com
+Phone: +91-7058412735
+GitHub: https://github.com
+LinkedIn: https://linkedin.com
+======================================================================
+
+----------------------------------------------------------------------
+CAREER OBJECTIVE
+----------------------------------------------------------------------
+Results-driven MERN Stack Developer with hands-on experience building real-time 
+and AI-powered web applications. Skilled in React, Node.js, Express, MySQL, 
+MongoDB, Jira, Manual testing, and workflow automation. Committed to building 
+and testing reliable, scalable systems with real-time and AI-driven capabilities 
+and aiming to deliver scalable, high-performance solutions while continuously 
+improving product quality and user experience.
+
+----------------------------------------------------------------------
+TECHNICAL SKILLS & MASTERIES
+----------------------------------------------------------------------
+* Programming Lang: C, C++, Java, Python, JS
+* Frontend: Bootstrap, Tailwind CSS, React.js
+* Backend: Node.js, Express JS, Django
+* Database: MySQL, MongoDB, SQLite
+* DevOps: Vercel, Render
+* Tools: Git, GitHub
+* OS: Linux, Windows
+* Testing: Jira, Manual Testing, Bug Tracking
+
+----------------------------------------------------------------------
+CORE PROJECTS SHIPPED
+----------------------------------------------------------------------
+
+1. LINKUP - WEB CHAT APP
+   * Developed a real-time messaging application built with React, Node.js, 
+     Express, and MySQL.
+   * Features private and group chats, file sharing, and audio/video calls. 
+   * Utilizes Socket.io for instant bidirectional communication and Cloudinary
+     for scalable media management, complete with an admin dashboard.
+   * Technologies: MERN, Tailwind CSS, GenAI, Socket.io, Cloudinary
+   * Completed: December 2025
+
+2. SKILLSFLUXO - LMS PORTAL
+   * Developed SkillFluxo, a full-stack Learning Management System using 
+     React.js, Node.js, and MySQL. 
+   * Engineered Role-Based Access Control (RBAC) for Admins, Trainers, and Students.
+   * Features interactive performance dashboards and a premium, responsive UI.
+   * Technologies: MERN, Tailwind CSS, GenAI, Cloudinary
+   * Completed: November 2025
+
+3. HIREPUR - JOB PORTAL
+   * Developed a full-stack job portal using Django MVT to bridge the gap 
+     between employers and job seekers.
+   * Features secure role-based authentication and comprehensive profile management,
+     end-to-end recruitment workflows, search filters, and real-time application tracking.
+   * Technologies: HTML, CSS, Javascript, Django, GenAI, Django REST, SQLite
+   * Completed: May 2025
+
+----------------------------------------------------------------------
+INTERNSHIP & TRAINING
+----------------------------------------------------------------------
+* Intern, MERN Stack Development and AI Automation (Aug - Jan 2026)
+  AutoFlow Technologies, Pune
+  * Built production-ready MERN features (React, Node.js, Express, MySQL, MongoDB)
+    and integrated AI workflows.
+  * Worked in an agile, Git-based corporate setup, Jira, Manual Testing, and
+    contributing to scalable APIs and real-time modules.
+
+----------------------------------------------------------------------
+EDUCATION & CREDENTIALS
+----------------------------------------------------------------------
+* B.Sc. in Computer Science (2023 - 2026)
+  Shriram Institute of Information Technology, Paniv
+  GPA: 8.5 / 10
+
+* HSC (Higher Secondary Certificate) (2021 - 2023)
+  Sadashivrao Mane Vidyalaya, Akluj
+  Percentage: 50.17%
+
+* SSC (Secondary School Certificate) (2020)
+  Sadashivrao Mane Vidyalaya, Akluj
+  Percentage: 82.00%
+
+----------------------------------------------------------------------
+CERTIFICATION
+----------------------------------------------------------------------
+* MERN Stack Development and AI Integration (2026)
+
+======================================================================
+Generated via Harsh Mahesh Kshirsagar Digital Portfolio Environment.
+======================================================================
