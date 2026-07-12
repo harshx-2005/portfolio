@@ -1,3 +1,5 @@
+'use client';
+
 import { 
   FaReact, FaNodeJs, FaGitAlt, FaHtml5, FaCss3Alt, FaJsSquare, FaDatabase, FaGithub 
 } from 'react-icons/fa';
@@ -24,16 +26,13 @@ const MARQUEE_TECH = [
 ];
 
 export default function TechMarquee() {
-  // Double the list to make a seamless infinite loop bridge
   const doubleTech = [...MARQUEE_TECH, ...MARQUEE_TECH, ...MARQUEE_TECH];
 
   return (
     <div className="relative w-full overflow-hidden py-6 bg-slate-950/20 border-y border-white/[0.03] backdrop-blur-sm select-none">
-      {/* Side Vignette Fades */}
       <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#030014] to-transparent z-10 pointer-events-none" />
       <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#030014] to-transparent z-10 pointer-events-none" />
 
-      {/* Marquee conveyor wrapper */}
       <div className="flex w-max hover:[&>div]:pause-marquee">
         <div className="flex gap-8 px-4 animate-marquee whitespace-nowrap">
           {doubleTech.map((tech, i) => {

@@ -1,22 +1,23 @@
+'use client';
+
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPaperPlane, FaCopy, FaCheck, FaMapMarkerAlt, FaEnvelope, FaGithub, FaLinkedin, FaInstagram, FaDiscord, FaPhoneAlt } from 'react-icons/fa';
+import { SiWhatsapp } from 'react-icons/si';
 import { personalDetails } from '../constants/portfolioData';
 
-const FORMSPREE_FORM_ID = "https://formspree.io/f/mpqnyqrw"; // Replace with your actual Formspree form ID
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [errors, setErrors] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Custom toast notification states
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
   const [copiedDiscord, setCopiedDiscord] = useState(false);
 
-  const triggerToast = (msg) => {
+  const triggerToast = (msg: string) => {
     setToastMessage(msg);
     setShowToast(true);
     setTimeout(() => {
@@ -26,9 +27,9 @@ export default function Contact() {
 
   const copyEmail = () => {
     navigator.clipboard.writeText(personalDetails.socials.email);
-    setCopied(true);
+    setCopiedEmail(true);
     triggerToast("Email address copied to clipboard!");
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopiedEmail(false), 2000);
   };
 
   const copyPhone = () => {
@@ -74,7 +75,7 @@ export default function Contact() {
     return isValid;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
@@ -104,7 +105,20 @@ export default function Contact() {
     }
   };
 
-  const handleInputChange = (key, val) => {
+  const handleWhatsAppSend = () => {
+    if (!validate()) {
+      triggerToast("Please fill in the form fields before launching WhatsApp.");
+      return;
+    }
+    const cleanPhone = personalDetails.socials.phone.replace(/[^0-9]/g, "");
+    const formattedMsg = encodeURIComponent(
+      `Hi Harsh,\n\nMy name is ${formData.name}.\nEmail: ${formData.email}\n\nRequirements:\n${formData.message}`
+    );
+    const waUrl = `https://wa.me/${cleanPhone}?text=${formattedMsg}`;
+    window.open(waUrl, '_blank');
+  };
+
+  const handleInputChange = (key: 'name' | 'email' | 'message', val: string) => {
     setFormData(prev => ({ ...prev, [key]: val }));
     if (errors[key]) {
       setErrors(prev => ({ ...prev, [key]: '' }));
@@ -112,8 +126,8 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="relative py-28 overflow-hidden bg-[#030014]">
-      {/* Background glow overlay */}
+    <section id="contact" className="relative py-28 overflow-hidden bg-darkBg">
+      {/* Background spotlights */}
       <div className="absolute top-[30%] left-[-10%] w-[380px] h-[380px] glow-orb-primary rounded-full blur-[100px] pointer-events-none opacity-25 animate-pulse" />
       <div className="absolute bottom-[10%] right-[-10%] w-[380px] h-[380px] glow-orb-secondary rounded-full blur-[100px] pointer-events-none opacity-20 animate-pulse" />
 
@@ -140,11 +154,11 @@ export default function Contact() {
             </h3>
             
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed mb-4">
-              I am open to engineering partnerships, freelance developments, and technical MERN/Django opportunities. Drop your specifications in the dispatch panel and I'll follow up shortly.
+              I am open to engineering partnerships, freelance developments, and technical MERN/Django/Next.js opportunities. Drop your specifications in the dispatch panel or connect instantly.
             </p>
 
             <div className="flex flex-col gap-4">
-              {/* Location Badge */}
+              {/* Location */}
               <div className="glass-card p-5 rounded-2xl border border-white/[0.04] bg-white/[0.01] flex items-center gap-4 hover:border-blue-500/25 transition-all duration-300">
                 <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
                   <FaMapMarkerAlt className="w-4 h-4" />
@@ -155,7 +169,7 @@ export default function Contact() {
                 </div>
               </div>
 
-              {/* Phone Badge */}
+              {/* Phone */}
               <div 
                 onClick={copyPhone}
                 className="glass-card p-5 rounded-2xl border border-white/[0.04] bg-white/[0.01] flex items-center justify-between gap-4 hover:border-cyan-500/25 cursor-pointer transition-all duration-300 group"
@@ -174,7 +188,7 @@ export default function Contact() {
                 </button>
               </div>
 
-              {/* Email Badge (Copy Trigger) */}
+              {/* Email */}
               <div 
                 onClick={copyEmail}
                 className="glass-card p-5 rounded-2xl border border-white/[0.04] bg-white/[0.01] flex items-center justify-between gap-4 hover:border-purple-500/25 cursor-pointer transition-all duration-300 group"
@@ -189,12 +203,12 @@ export default function Contact() {
                   </div>
                 </div>
                 <button className="text-slate-400 group-hover:text-purple-400 transition-colors mr-2">
-                  {copied ? <FaCheck className="w-4 h-4 text-emerald-500" /> : <FaCopy className="w-4 h-4" />}
+                  {copiedEmail ? <FaCheck className="w-4 h-4 text-emerald-500" /> : <FaCopy className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Social icons links */}
+            {/* Social handles links */}
             <div className="flex items-center gap-4 mt-4 justify-center lg:justify-start">
               <a 
                 href={personalDetails.socials.github} 
@@ -226,16 +240,16 @@ export default function Contact() {
                 className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 hover:text-indigo-400 hover:border-indigo-500/20 transition-all duration-300 cursor-pointer"
                 aria-label="Copy Discord username"
               >
-                {copiedDiscord ? <FaCheck className="w-4 h-4 text-emerald-400" /> : <FaDiscord className="w-5 h-5" />}
+                {copiedDiscord ? <FaCheck className="w-4 h-4 text-emerald-500" /> : <FaDiscord className="w-5 h-5" />}
               </button>
             </div>
           </div>
 
-          {/* Right Column: Cyber mock Email Form Client */}
+          {/* Right Column: Form Client */}
           <div className="w-full lg:w-[60%]">
-            <div className="glass-card rounded-3xl border border-white/[0.06] bg-slate-950/40 p-6 sm:p-8 shadow-2xl relative overflow-hidden select-none">
+            <div className="glass-card rounded-3xl border border-white/[0.06] bg-slate-950/40 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
               
-              {/* macOS bar decoration */}
+              {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-6">
                 <div className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded-full bg-red-500/40" />
@@ -248,8 +262,8 @@ export default function Contact() {
                 <div className="w-5 h-5" />
               </div>
 
-              {/* Form elements */}
-              <form onSubmit={handleSubmit} className="space-y-5 select-none">
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Sender Name */}
                 <div className="flex flex-col gap-1.5">
                   <label className="font-mono-tech text-[10px] uppercase font-bold text-slate-400 tracking-wider">Sender Name</label>
@@ -276,11 +290,11 @@ export default function Contact() {
                   {errors.email && <p className="font-mono-tech text-[10px] text-red-400 mt-1 select-none">{errors.email}</p>}
                 </div>
 
-                {/* Message Specs */}
+                {/* Message */}
                 <div className="flex flex-col gap-1.5">
                   <label className="font-mono-tech text-[10px] uppercase font-bold text-slate-400 tracking-wider">System Specifications (Message)</label>
                   <textarea
-                    rows="4"
+                    rows={4}
                     value={formData.message}
                     onChange={(e) => handleInputChange('message', e.target.value)}
                     placeholder="Outline your project requirements or hello message..."
@@ -289,24 +303,37 @@ export default function Contact() {
                   {errors.message && <p className="font-mono-tech text-[10px] text-red-400 mt-1 select-none">{errors.message}</p>}
                 </div>
 
-                {/* Submit Action Button */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2.5 py-4.5 rounded-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white cursor-pointer hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 select-none shadow-lg text-sm"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-5 h-5 border-[3px] border-white/20 border-t-white rounded-full animate-spin" />
-                      Transmitting Data Core...
-                    </>
-                  ) : (
-                    <>
-                      <FaPaperPlane className="w-4 h-4" />
-                      Transmit message
-                    </>
-                  )}
-                </button>
+                {/* Actions row */}
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  {/* Submit Formspree */}
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full sm:flex-1 flex items-center justify-center gap-2.5 py-4 rounded-xl font-bold bg-indigo-600 border border-indigo-500/20 text-white cursor-pointer hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg text-xs tracking-wider uppercase"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-4 h-4 border-[2px] border-white/20 border-t-white rounded-full animate-spin" />
+                        Transmitting...
+                      </>
+                    ) : (
+                      <>
+                        <FaPaperPlane className="w-3.5 h-3.5" />
+                        Transmit Message
+                      </>
+                    )}
+                  </button>
+
+                  {/* WhatsApp Workflow */}
+                  <button
+                    type="button"
+                    onClick={handleWhatsAppSend}
+                    className="w-full sm:flex-1 flex items-center justify-center gap-2.5 py-4 rounded-xl font-bold bg-emerald-600/10 border border-emerald-500/30 text-emerald-400 cursor-pointer hover:bg-emerald-600 hover:text-white hover:border-transparent active:scale-[0.99] transition-all duration-300 text-xs tracking-wider uppercase"
+                  >
+                    <SiWhatsapp className="w-4 h-4" />
+                    Launch on WhatsApp
+                  </button>
+                </div>
               </form>
 
             </div>
@@ -316,7 +343,7 @@ export default function Contact() {
 
       </div>
 
-      {/* Floating custom spring Toast notification */}
+      {/* Floating Toast Notification */}
       <AnimatePresence>
         {showToast && (
           <motion.div

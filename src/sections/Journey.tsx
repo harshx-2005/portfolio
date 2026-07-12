@@ -1,12 +1,22 @@
+'use client';
+
 import { motion } from 'framer-motion';
 import { journeyTimeline } from '../constants/portfolioData';
 
-function TimelineItem({ item, index }) {
+interface JourneyItem {
+  date: string;
+  title: string;
+  description: string;
+  tags: string[];
+  category: string;
+}
+
+function TimelineItem({ item, index }: { item: JourneyItem; index: number }) {
   const isEven = index % 2 === 0;
 
   return (
     <div className="relative flex flex-col md:flex-row justify-between items-center w-full mb-12 select-none">
-      {/* Spacer or Card Container depending on index parity on desktop screen */}
+      {/* Left/Right Container on Desktop */}
       <div className={`w-full md:w-[45%] flex ${isEven ? "justify-end text-right" : "hidden md:flex"}`}>
         {isEven && (
           <motion.div 
@@ -36,7 +46,7 @@ function TimelineItem({ item, index }) {
         )}
       </div>
 
-      {/* Central Connector Circle Glow */}
+      {/* Central Circle Glow */}
       <div className="absolute left-6 md:left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full border-4 border-[#030014] bg-slate-900 flex items-center justify-center z-10 shadow-lg select-none">
         <motion.div 
           className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" 
@@ -50,7 +60,7 @@ function TimelineItem({ item, index }) {
         />
       </div>
 
-      {/* Opposite Content side */}
+      {/* Opposite Container */}
       <div className={`w-full md:w-[45%] flex ${!isEven ? "justify-start text-left" : "hidden md:flex"} pl-14 md:pl-0`}>
         {!isEven && (
           <motion.div 
@@ -80,7 +90,7 @@ function TimelineItem({ item, index }) {
         )}
       </div>
 
-      {/* Fallback column layout details for mobile views */}
+      {/* Mobile Layout Fallback */}
       <div className="md:hidden w-full pl-14 mt-1">
         {isEven && (
           <motion.div 
@@ -115,8 +125,8 @@ function TimelineItem({ item, index }) {
 
 export default function Journey() {
   return (
-    <section id="journey" className="relative py-28 overflow-hidden bg-[#030014]">
-      {/* Background radial spotlights */}
+    <section id="journey" className="relative py-28 overflow-hidden bg-darkBg">
+      {/* Background spotlights */}
       <div className="absolute top-[20%] right-[-10%] w-[380px] h-[380px] glow-orb-secondary rounded-full blur-[100px] pointer-events-none opacity-20" />
       <div className="absolute bottom-[20%] left-[-10%] w-[380px] h-[380px] glow-orb-primary rounded-full blur-[100px] pointer-events-none opacity-20" />
 
@@ -133,12 +143,11 @@ export default function Journey() {
           <div className="w-12 h-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mt-4 mx-auto md:mx-0" />
         </div>
 
-        {/* Timeline wrapper container */}
+        {/* Timeline wrapper */}
         <div className="relative w-full flex flex-col items-center">
-          {/* Vertical central tube wire line */}
+          {/* Vertical line connector */}
           <div className="absolute top-0 bottom-0 left-6 md:left-1/2 transform -translate-x-1/2 w-[3px] bg-gradient-to-b from-blue-500 via-indigo-500 to-purple-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
 
-          {/* Timeline Nodes mapping */}
           {journeyTimeline.map((item, i) => (
             <TimelineItem key={i} item={item} index={i} />
           ))}

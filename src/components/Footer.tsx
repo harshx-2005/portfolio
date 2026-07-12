@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { FaGithub, FaLinkedin, FaInstagram, FaDiscord, FaEnvelope, FaCheck } from 'react-icons/fa';
 import { personalDetails } from '../constants/portfolioData';
@@ -22,7 +24,7 @@ export default function Footer() {
     setTimeout(() => setCopiedDiscord(false), 2000);
   };
 
-  const handleScrollTo = (e, id) => {
+  const handleScrollTo = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
     const el = document.getElementById(id);
     if (el) {
@@ -40,13 +42,13 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-[#030014] border-t border-white/5 py-12 select-none overflow-hidden">
-      {/* Decorative background ambient orb */}
+    <footer className="relative bg-[#030014] border-t border-white/5 py-12 select-none overflow-hidden z-10">
+      {/* Background ambient light */}
       <div className="absolute bottom-[-100px] left-1/2 transform -translate-x-1/2 w-[350px] h-[200px] bg-purple-600/10 rounded-full blur-[80px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 flex flex-col items-center text-center">
         
-        {/* Brand logo header */}
+        {/* Brand Logo */}
         <a 
           href="#home" 
           onClick={(e) => handleScrollTo(e, "home")}
@@ -60,12 +62,12 @@ export default function Footer() {
           </span>
         </a>
 
-        {/* Tagline short info */}
+        {/* Tagline */}
         <p className="text-xs sm:text-sm text-slate-500 max-w-md mb-8 leading-relaxed">
           {personalDetails.tagline} Focused on shipping resilient web applications and integrating advanced artificial intelligence.
         </p>
 
-        {/* Footer shortcuts shortcuts */}
+        {/* Footer shortcuts links */}
         <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-8 max-w-2xl select-none">
           {NAV_LINKS.map((link) => (
             <li key={link.id}>
@@ -80,7 +82,7 @@ export default function Footer() {
           ))}
         </ul>
 
-        {/* Social icon link row */}
+        {/* Social link icons */}
         <div className="flex items-center gap-6 mb-8">
           <a 
             href={personalDetails.socials.github} 
@@ -134,14 +136,14 @@ export default function Footer() {
           </a>
         </div>
 
-        {/* Solid divider line */}
+        {/* Divider */}
         <div className="w-full max-w-4xl h-[1px] bg-white/5 mb-8" />
 
-        {/* copyright notes */}
+        {/* Copyright notice */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full max-w-4xl text-[10px] sm:text-xs text-slate-500 font-mono-tech select-none">
           <p>&copy; {new Date().getFullYear()} Harsh Mahesh Kshirsagar. All rights reserved.</p>
           <p className="hover:text-indigo-400 transition-colors">
-            Built with React &bull; Tailwind CSS &bull; Framer Motion
+            Built with React &bull; Next.js &bull; Tailwind CSS &bull; Framer Motion
           </p>
         </div>
 

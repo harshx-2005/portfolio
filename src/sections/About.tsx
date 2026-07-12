@@ -1,18 +1,20 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { personalDetails, statistics } from '../constants/portfolioData';
 import { GiBrain, GiProgression } from 'react-icons/gi';
 import { FaCogs } from 'react-icons/fa';
 
-function CountUp({ value, suffix, duration = 2 }) {
+function CountUp({ value, suffix, duration = 2 }: { value: number; suffix: string; duration?: number }) {
   const [count, setCount] = useState(0);
-  const ref = useRef(null);
+  const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   useEffect(() => {
     if (isInView) {
-      let startTime = null;
-      const animateCount = (timestamp) => {
+      let startTime: number | null = null;
+      const animateCount = (timestamp: number) => {
         if (!startTime) startTime = timestamp;
         const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
         setCount(Math.floor(progress * value));
@@ -40,19 +42,19 @@ export default function About() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15
+        staggerChildren: 0.12
       }
     }
-  };
+  } as const;
 
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
-  };
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } }
+  } as const;
 
   return (
-    <section id="about" className="relative py-28 overflow-hidden bg-[#030014]">
-      {/* Glow orb background spot */}
+    <section id="about" className="relative py-28 overflow-hidden bg-darkBg">
+      {/* Background Orbs */}
       <div className="absolute top-[20%] right-[-10%] w-[350px] h-[350px] glow-orb-secondary rounded-full blur-[100px] pointer-events-none opacity-20" />
       <div className="absolute bottom-[20%] left-[-10%] w-[350px] h-[350px] glow-orb-primary rounded-full blur-[100px] pointer-events-none opacity-20" />
 
@@ -77,7 +79,7 @@ export default function About() {
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
         >
-          {/* Bio text block column */}
+          {/* Bio text block */}
           <motion.div className="flex-1 space-y-6" variants={itemVariants}>
             <h3 className="font-display font-extrabold text-2xl text-white tracking-tight">
               A software builder driven by scalability, clean design, and <span className="text-indigo-400">AI innovation</span>.
@@ -92,11 +94,11 @@ export default function About() {
             </p>
 
             <p className="font-sans text-slate-400 leading-relaxed text-sm sm:text-base">
-              I am constantly exploring advanced AI integrations, including speech synthesizers and automated assistants. Whether it's crafting a Django backend, designing a modular React app, or implementing QA scripts, I strive for coding excellence in every project.
+              I am constantly exploring advanced AI integrations, including speech synthesizers and automated assistants. Whether it's crafting a Django backend, designing a modular React/Next.js app, or implementing QA scripts, I strive for coding excellence in every project.
             </p>
           </motion.div>
 
-          {/* Stats counters box grid column */}
+          {/* Stats counters grid */}
           <motion.div 
             className="flex-1 w-full grid grid-cols-2 gap-6 select-none"
             variants={itemVariants}
@@ -120,7 +122,7 @@ export default function About() {
           </motion.div>
         </motion.div>
 
-        {/* Narrative core pillars grid cards */}
+        {/* Narrative core pillars */}
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 select-none"
           variants={containerVariants}

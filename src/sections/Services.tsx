@@ -1,3 +1,5 @@
+'use client';
+
 import { motion } from 'framer-motion';
 import { servicesData } from '../constants/portfolioData';
 
@@ -7,19 +9,19 @@ export default function Services() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
+        staggerChildren: 0.08
       }
     }
-  };
+  } as const;
 
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
-  };
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } }
+  } as const;
 
   return (
-    <section id="services" className="relative py-28 overflow-hidden bg-[#030014]">
-      {/* Background ambient light gradients */}
+    <section id="services" className="relative py-28 overflow-hidden bg-darkBg">
+      {/* Background ambient lights */}
       <div className="absolute top-[20%] left-[-10%] w-[400px] h-[400px] glow-orb-primary rounded-full blur-[120px] pointer-events-none opacity-20" />
       <div className="absolute bottom-[20%] right-[-10%] w-[400px] h-[400px] glow-orb-secondary rounded-full blur-[120px] pointer-events-none opacity-20" />
 
@@ -36,7 +38,7 @@ export default function Services() {
           <div className="w-12 h-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mt-4 mx-auto md:mx-0" />
         </div>
 
-        {/* Services grid cards */}
+        {/* Services grid */}
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 select-none"
           variants={containerVariants}
@@ -53,7 +55,7 @@ export default function Services() {
                 variants={itemVariants}
                 whileHover={{ y: -5, border: "1px solid rgba(139, 92, 246, 0.2)" }}
               >
-                {/* Background glow highlights centered in each service card */}
+                {/* Background glow highlights */}
                 <div 
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" 
                   style={{
@@ -78,7 +80,7 @@ export default function Services() {
                   </p>
                 </div>
 
-                {/* Animated visual border neon bar at the bottom */}
+                {/* Bottom border animated overlay */}
                 <div className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
               </motion.div>
             );

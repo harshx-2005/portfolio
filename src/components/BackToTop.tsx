@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowUp } from 'react-icons/fa';
@@ -7,13 +9,12 @@ export default function BackToTop() {
 
   useEffect(() => {
     const toggleVisibility = () => {
-      if (window.scrollY > 400) {
+      if (window.scrollY > 300) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
       }
     };
-
     window.addEventListener('scroll', toggleVisibility);
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
@@ -21,7 +22,7 @@ export default function BackToTop() {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   };
 
@@ -30,15 +31,13 @@ export default function BackToTop() {
       {isVisible && (
         <motion.button
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-[98] flex items-center justify-center w-12 h-12 rounded-full border border-purple-500/30 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] bg-slate-950/70 backdrop-blur-md cursor-pointer hover:bg-purple-600 hover:border-purple-600 hover:text-white transition-all duration-300"
-          initial={{ opacity: 0, scale: 0.5, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.5, y: 20 }}
-          whileHover={{ y: -3, scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          aria-label="Scroll back to top"
+          className="fixed bottom-6 left-6 z-40 w-11 h-11 rounded-xl bg-slate-900/60 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500/30 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] backdrop-blur-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-300"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          aria-label="Back to top"
         >
-          <FaArrowUp className="text-sm animate-bounce" />
+          <FaArrowUp className="w-4 h-4" />
         </motion.button>
       )}
     </AnimatePresence>
