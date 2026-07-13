@@ -1271,7 +1271,7 @@ function Contact() {
   return (
     <section id="contact" className="relative py-28 sm:py-36">
       <div className="container-page">
-        <div className="surface-card relative overflow-hidden p-6 sm:p-12 lg:p-16">
+        <div className="surface-card relative overflow-hidden px-4 py-6 sm:p-12 lg:p-16">
           <AuroraBackground />
           <div className="relative grid gap-12 lg:grid-cols-[1fr_1fr]">
             <div>
