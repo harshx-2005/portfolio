@@ -1214,8 +1214,8 @@ function Education() {
 }
 
 function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("sending");
     const form = e.currentTarget;
@@ -1223,10 +1223,34 @@ function ContactForm() {
     const name = String(data.get("name") || "");
     const email = String(data.get("email") || "");
     const message = String(data.get("message") || "");
-    const body = encodeURIComponent(`From: ${name} <${email}>\n\n${message}`);
-    const subject = encodeURIComponent(`Portfolio enquiry from ${name}`);
-    window.location.href = `mailto:theharshkshirsagar@gmail.com?subject=${subject}&body=${body}`;
-    setTimeout(() => { setStatus("sent"); form.reset(); }, 600);
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: "c654bbf6-3b1d-4ced-905d-f93318679415",
+          name,
+          email,
+          message,
+          subject: `New Portfolio Message from ${name}`,
+        }),
+      });
+
+      const res = await response.json();
+      if (res.success) {
+        setStatus("sent");
+        form.reset();
+      } else {
+        setStatus("error");
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("error");
+    }
   }
   return (
     <form onSubmit={onSubmit} className="grid gap-5">
@@ -1260,7 +1284,13 @@ function ContactForm() {
         </span>
       </label>
       <button type="submit" className="btn-primary self-start" disabled={status === "sending"}>
-        {status === "sent" ? "Sent — check your mail app" : status === "sending" ? "Opening…" : "Send message"}
+        {status === "sent" 
+          ? "Message sent!" 
+          : status === "sending" 
+            ? "Sending..." 
+            : status === "error" 
+              ? "Error - try again" 
+              : "Send message"}
         <ArrowUpRight className="h-4 w-4" />
       </button>
     </form>
