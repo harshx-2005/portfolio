@@ -1229,7 +1229,7 @@ function ContactForm() {
     setTimeout(() => { setStatus("sent"); form.reset(); }, 600);
   }
   return (
-    <form onSubmit={onSubmit} className="grid gap-5 max-w-md mx-auto lg:mx-0 lg:max-w-none w-full">
+    <form onSubmit={onSubmit} className="grid gap-5">
       {[
         { name: "name", label: "Your name", type: "text", required: true },
         { name: "email", label: "Email", type: "email", required: true },
@@ -1259,7 +1259,7 @@ function ContactForm() {
           Tell me about the project
         </span>
       </label>
-      <button type="submit" className="btn-primary self-center lg:self-start" disabled={status === "sending"}>
+      <button type="submit" className="btn-primary self-start" disabled={status === "sending"}>
         {status === "sent" ? "Sent — check your mail app" : status === "sending" ? "Opening…" : "Send message"}
         <ArrowUpRight className="h-4 w-4" />
       </button>
@@ -1271,24 +1271,21 @@ function Contact() {
   return (
     <section id="contact" className="relative py-28 sm:py-36">
       <div className="container-page">
-        <div className="surface-card relative overflow-hidden p-8 sm:p-12 lg:p-16">
+        <div className="surface-card relative overflow-hidden p-6 sm:p-12 lg:p-16">
           <AuroraBackground />
           <div className="relative grid gap-12 lg:grid-cols-[1fr_1fr]">
-            <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-              <div className="eyebrow justify-center lg:justify-start">
-                <span className="h-px w-8 bg-current opacity-40 hidden lg:inline-block" />
-                Contact
-              </div>
+            <div>
+              <div className="eyebrow"><span className="h-px w-8 bg-current opacity-40" />Contact</div>
               <h2 className="section-heading mt-4 text-foreground">
                 Let's build something{" "}
                 <span className="text-gradient-primary">worth shipping.</span>
               </h2>
-              <p className="mt-5 text-base text-muted-foreground sm:text-lg max-w-md mx-auto lg:mx-0">
+              <p className="mt-5 text-base text-muted-foreground sm:text-lg">
                 Whether it's a production website, an AI agent, a voice chat bot or a real-time product —
                 I'm currently taking on a small number of new engagements.
               </p>
 
-              <div className="mt-8 grid gap-3 w-full max-w-md mx-auto lg:mx-0 text-left">
+              <div className="mt-8 grid gap-3">
                 <a href="mailto:theharshkshirsagar@gmail.com" className="glass flex items-center gap-4 rounded-2xl p-4 glow-hover">
                   <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-accent"><Mail className="h-5 w-5" /></div>
                   <div className="min-w-0">
