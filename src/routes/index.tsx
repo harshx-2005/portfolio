@@ -16,6 +16,7 @@ import portrait from "@/assets/harsh-portrait.jpg";
 import shotGraphene from "@/assets/shot-graphene.png";
 import shotHirepur from "@/assets/shot-hirepur.png";
 import shotLinkup from "@/assets/shot-linkup.png";
+import shotPara from "@/assets/shot-para.png";
 import resumePdf from "@/assets/HarshResume.pdf";
 import pageCss from "../editorial.css?url";
 
@@ -75,6 +76,25 @@ const PROJECTS = [
       "Location pages with their own routes, so each Midlands town can rank on its own.",
       "A drag-to-compare before/after slider, because the transformation is the product.",
       "Quote forms that send each lead straight to the owner on WhatsApp.",
+    ],
+  },
+  {
+    id: "para",
+    name: "Pára",
+    kind: "Concept website",
+    year: "2026",
+    client: "Concept (a made-up thermal bath house in Krkonoše, CZ)",
+    role: "Design, motion, build",
+    stack: "Next.js, React, GSAP ScrollTrigger, Lenis, Canvas 2D",
+    image: shotPara,
+    live: "https://para-resort.vercel.app/",
+    repo: "https://github.com/harshx-2005/para-resort",
+    kicker: "A thermal bath house you have to wipe the steam off",
+    lede: "A concept site for a quiet spa hotel in the Czech mountains. The opening screen is a steamed-up window: you move the mouse to wipe it clear, and the fog slowly creeps back.",
+    notes: [
+      "The fog is drawn on a canvas. Where you wipe, it clears in soft strokes, drips run down from the edges, and it fogs over again.",
+      "“One day at Pára” pins the screen while you scroll: the sky, the photos and a clock move from first light to night.",
+      "The rooms are laid out like numbered plates in an old catalogue, with Czech names under the English ones.",
     ],
   },
   {
