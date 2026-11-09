@@ -13,9 +13,9 @@ import {
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 import portrait from "@/assets/harsh-portrait.jpg";
-import shotGraphene from "@/assets/project-graphene.png";
-import shotHirepur from "@/assets/project-hirepur.png";
-import shotLinkup from "@/assets/project-linkup.jpg";
+import shotGraphene from "@/assets/shot-graphene.png";
+import shotHirepur from "@/assets/shot-hirepur.png";
+import shotLinkup from "@/assets/shot-linkup.png";
 import resumePdf from "@/assets/HarshResume.pdf";
 import pageCss from "../editorial.css?url";
 
