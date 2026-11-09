@@ -60,9 +60,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-const TITLE = "Harsh Kshirsagar — MERN Stack & AI-Powered Developer";
+const TITLE = "Harsh Kshirsagar — Full-stack developer";
 const DESCRIPTION =
-  "Portfolio of Harsh Kshirsagar — Full-stack developer building real-time, AI-powered products with Next.js, React, TypeScript, Node.js and MongoDB.";
+  "Harsh Kshirsagar designs and builds websites by hand: Next.js, React, Node and Django, from first sketch to deploy.";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -72,7 +72,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: TITLE },
       { name: "description", content: DESCRIPTION },
       { name: "author", content: "Harsh Mahesh Kshirsagar" },
-      { name: "theme-color", content: "#050816" },
+      { name: "theme-color", content: "#ecebe6" },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
@@ -88,7 +88,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap",
       },
     ],
   }),

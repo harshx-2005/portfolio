@@ -1,52 +1,35 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AnimatePresence, motion, useScroll, useSpring, useTransform, type Variants } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowUp,
-  ArrowUpRight,
-  ArrowRight,
-  Award,
-  Briefcase,
-  Check,
-  ChevronDown,
-  Code2,
-  Cpu,
-  Database,
-  Download,
-  ExternalLink,
-  Github,
-  GraduationCap,
-  Layers,
-  Linkedin,
-  Mail,
-  MapPin,
-  Menu,
-  
-  Phone,
-  Rocket,
-  Sparkles,
-  Wrench,
-  X,
-  Zap,
-} from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa";
+  motion,
+  useAnimationFrame,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+  useVelocity,
+  type MotionValue,
+} from "framer-motion";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
-import heroPortrait from "@/assets/harsh-portrait.jpg";
-import projectGraphene from "@/assets/project-graphene.png";
-import projectHirepur from "@/assets/project-hirepur.png";
-import projectLinkup from "@/assets/project-linkup.jpg";
+import portrait from "@/assets/harsh-portrait.jpg";
+import shotGraphene from "@/assets/project-graphene.png";
+import shotHirepur from "@/assets/project-hirepur.png";
+import shotLinkup from "@/assets/project-linkup.jpg";
 import resumePdf from "@/assets/HarshResume.pdf";
+import pageCss from "../editorial.css?url";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { property: "og:image", content: heroPortrait },
-      { property: "og:image:width", content: "1024" },
-      { property: "og:image:height", content: "1280" },
+      { property: "og:image", content: portrait },
       { property: "og:image:alt", content: "Portrait of Harsh Kshirsagar" },
-      { name: "twitter:image", content: heroPortrait },
+      { name: "twitter:image", content: portrait },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [
+      { rel: "canonical", href: "/" },
+      { rel: "stylesheet", href: pageCss },
+    ],
     scripts: [
       {
         type: "application/ld+json",
@@ -54,16 +37,12 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "Person",
           name: "Harsh Mahesh Kshirsagar",
-          jobTitle: "MERN / PERN Stack & AI Agent Developer",
-          email: "mailto:theharshkshirsagar@gmail.com",
-          telephone: "+91-7058412735",
-          image: heroPortrait,
+          jobTitle: "Full Stack Developer",
+          email: "mailto:" + EMAIL,
+          image: portrait,
           url: "/",
-          address: { "@type": "PostalAddress", addressLocality: "Akluj", addressRegion: "Solapur", addressCountry: "IN" },
-          sameAs: [
-            "https://github.com/harshx-2005",
-            "https://www.linkedin.com/in/harshkshirsagar",
-          ],
+          address: { "@type": "PostalAddress", addressLocality: "Akluj", addressRegion: "Maharashtra", addressCountry: "IN" },
+          sameAs: [GITHUB, LINKEDIN],
         }),
       },
     ],
@@ -71,1147 +50,544 @@ export const Route = createFileRoute("/")({
   component: PortfolioPage,
 });
 
-/* ============================================================================
- *  DATA
- * ========================================================================== */
+/* ---------------------------------------------------------------- data -- */
 
-const NAV_LINKS = [
-  { href: "#about", label: "About" },
-  { href: "#skills", label: "Skills" },
-  { href: "#experience", label: "Experience" },
-  { href: "#projects", label: "Work" },
-  { href: "#education", label: "Education" },
-  { href: "#contact", label: "Contact" },
-];
-
-const STATS = [
-  { value: "9.1", label: "Computer Science CGPA" },
-  { value: "15+", label: "Technologies" },
-  { value: "10+", label: "Projects" },
-  { value: "5+", label: "Clients" },
-];
-
-const SKILLS: { category: string; icon: typeof Code2; items: string[] }[] = [
-  {
-    category: "Frontend",
-    icon: Layers,
-    items: ["Next.js", "React.js", "TypeScript", "JavaScript", "Tailwind CSS", "Framer Motion", "React Three Fiber", "Responsive Design"],
-  },
-  {
-    category: "Backend",
-    icon: Cpu,
-    items: ["Node.js", "Express.js", "PERN Stack", "REST APIs", "JWT", "Real-time APIs", "Cloudinary"],
-  },
-  {
-    category: "Languages",
-    icon: Code2,
-    items: ["TypeScript", "JavaScript", "Python", "C", "C++", "Java"],
-  },
-  {
-    category: "Database",
-    icon: Database,
-    items: ["MySQL", "MongoDB", "PostgreSQL", "Supabase", "Neon", "Firebase"],
-  },
-  {
-    category: "AI & Automation",
-    icon: Sparkles,
-    items: ["Google Gemini AI", "OpenAI", "Claude", "Prompt Engineering", "AI Agents", "Voice Chat Agents", "n8n", "Voiceflow", "AI Automation"],
-  },
-  {
-    category: "DevOps & Tools",
-    icon: Wrench,
-    items: ["Git", "GitHub", "Vercel", "Render", "Railway", "Jira", "Linux", "Windows"],
-  },
-  {
-    category: "Quality & SEO",
-    icon: Award,
-    items: ["Manual Testing", "Bug Tracking", "Technical SEO", "On-page SEO", "Performance Optimization"],
-  },
-  {
-    category: "Frameworks",
-    icon: Rocket,
-    items: ["Django", "Express.js", "Next.js"],
-  },
-];
+const EMAIL = "theharshkshirsagar@gmail.com";
+const GITHUB = "https://github.com/harshx-2005";
+const LINKEDIN = "https://www.linkedin.com/in/harsh-kshirsagar-975699338";
+const WHATSAPP = "https://wa.me/917058412735";
 
 const PROJECTS = [
   {
     id: "graphene",
-    featured: true,
-    name: "Graphene Interiors Ltd",
-    tagline: "Live production website for an international UK-based interior design studio.",
-    description:
-      "Engineered and deployed a live production website for an international UK-based interior design company. Architected localized SEO routing, developed an interactive Before/After comparison slider, integrated WhatsApp lead generation, and shipped a premium responsive production-ready UI.",
-    tech: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Framer Motion"],
-    year: "July 2026",
-    badges: ["Featured", "International Client", "Live", "Production"],
-    image: projectGraphene,
+    name: "Graphene Interiors",
+    kind: "Client website",
+    year: "2026",
+    client: "Graphene Interiors Ltd, Leicester (UK)",
+    role: "Freelance: design, build, deploy",
+    stack: "Next.js, React, TypeScript, Tailwind CSS, Framer Motion",
+    image: shotGraphene,
     live: "https://www.grapheneinteriors.com/",
-    repo: null,
-    accent: "from-amber-400/30 via-primary/20 to-transparent",
+    repo: "https://github.com/harshx-2005/graphene-interiors-live",
+    kicker: "A joinery brand from Leicester goes live",
+    lede: "Graphene build kitchens, wardrobes and media walls across the Midlands. They needed a site that turns local searches into quote requests, and I built and shipped it on my own for a client in another country.",
+    notes: [
+      "Location pages with their own routes, so each Midlands town can rank on its own.",
+      "A drag-to-compare before/after slider, because the transformation is the product.",
+      "Quote forms that send each lead straight to the owner on WhatsApp.",
+    ],
+    quote: "The work is timber and stone, so the website gets out of its way.",
   },
   {
     id: "hirepur",
-    featured: false,
     name: "HirePur",
-    tagline: "AI-powered recruitment platform with resume parsing & candidate matching.",
-    description:
-      "Resume parsing, AI candidate matching, real-time notifications, employer dashboard and a full job portal — powered by Gemini AI, Socket.IO and JWT auth.",
-    tech: ["React", "Node.js", "Express", "MySQL", "Socket.IO", "Gemini AI", "Cloudinary", "JWT"],
+    kind: "Recruitment platform",
     year: "2025",
-    badges: ["AI", "Real-time"],
-    image: projectHirepur,
+    client: "Side project",
+    role: "Full stack",
+    stack: "React, Node.js, Express, MySQL, Socket.IO, Gemini AI, Cloudinary",
+    image: shotHirepur,
     live: "https://hirepur.vercel.app/",
     repo: "https://github.com/harshx-2005/hirepur",
-    accent: "from-primary/30 via-secondary/20 to-transparent",
+    kicker: "Hiring, with the paperwork read for you",
+    lede: "A job platform with separate sides for employers and job seekers. Gemini reads uploaded resumes and matches candidates to open roles, so nobody has to fill in the same details twice.",
+    notes: [
+      "Role-based JWT auth with OTP email verification for both sides.",
+      "Gemini AI resume parsing and candidate-to-job matching.",
+      "Real-time Socket.IO notifications plus automated email alerts.",
+    ],
+    quote: "Upload a CV once, and the platform does the matching.",
   },
   {
     id: "linkup",
-    featured: false,
     name: "LinkUp",
-    tagline: "Real-time chat platform with audio, video calls & admin dashboard.",
-    description:
-      "Real-time chat, group chats, audio & video calls, admin dashboard and Cloudinary media pipeline over a Socket.IO backbone.",
-    tech: ["React", "Node.js", "Express", "MySQL", "Socket.IO", "Cloudinary"],
+    kind: "Real-time chat",
     year: "2025",
-    badges: ["Real-time", "WebRTC"],
-    image: projectLinkup,
-    live: "https://linkup-silk.vercel.app/login",
+    client: "Side project",
+    role: "Full stack",
+    stack: "MongoDB, Express, React, Node.js, Socket.IO, Tailwind CSS, Cloudinary",
+    image: shotLinkup,
+    live: "https://linkup-silk.vercel.app/",
     repo: "https://github.com/harshx-2005/linkup",
-    accent: "from-accent/30 via-primary/20 to-transparent",
+    kicker: "Messages, files and calls in one window",
+    lede: "A messaging app with private and group chats, file sharing, and audio and video calls, all running over one Socket.IO connection. Admins get a dashboard to moderate content.",
+    notes: [
+      "Private and group chats with file sharing through Cloudinary.",
+      "Audio and video calling built on top of Socket.IO signalling.",
+      "An admin dashboard for moderation and content management.",
+    ],
+    quote: "One socket carries the chat, the files and the call.",
   },
-];
-
-const EDUCATION = [
-  { period: "Present", title: "B.Sc Computer Science", org: "Shriram Institute of Information Technology", detail: "CGPA 9.1 / 10" },
-  { period: "HSC", title: "Higher Secondary Certificate", org: "Maharashtra State Board", detail: "50.17%" },
-  { period: "SSC", title: "Secondary School Certificate", org: "Maharashtra State Board", detail: "82%" },
 ];
 
 const EXPERIENCE = [
-  {
-    period: "Internship",
-    role: "MERN Stack Developer & AI Automation Intern",
-    company: "AutoFlow Technologies",
-    bullets: [
-      "Built production features on real-world APIs across the MERN stack.",
-      "Integrated AI automation flows and AI agent prototypes for internal tooling.",
-      "Owned end-to-end deployment and release management for production features.",
-      "Shipped code through Git workflow, Agile process and Jira tracking.",
-      "Owned manual testing, bug reproduction and regression cycles.",
-    ],
-  },
+  { when: "Jul 2026 — now", role: "Full Stack Developer Intern", org: "WhatBytes", what: "Next.js and Django REST features with LLM integrations, deployed on AWS (Amplify, EC2, RDS, S3, CloudFront)." },
+  { when: "Nov 2025 — Jan 2026", role: "MERN Stack & AI Automation Intern", org: "AutoFlow Technologies, Pune", what: "Production MERN features, AI-driven workflows and real-time modules in an agile team on Jira." },
 ];
 
-const CERTIFICATIONS = [
-  { name: "MERN Stack Development & AI Integration", issuer: "AutoFlow Technologies", year: "2025" },
+const EDUCATION = [
+  { when: "2026 — now", role: "Master of Computer Applications", org: "Uttaranchal University (online)" },
+  { when: "2023 — 2026", role: "B.Sc. Computer Science, CGPA 9.1", org: "Shriram Institute of Information Technology, Paniv" },
 ];
 
-/* ============================================================================
- *  UTILITIES
- * ========================================================================== */
+const TOOLKIT = [
+  ["Front", "Next.js, React, TypeScript, Tailwind CSS, Framer Motion"],
+  ["Back", "Node.js, Express, Django REST, Socket.IO, JWT"],
+  ["Data", "PostgreSQL, MySQL, MongoDB"],
+  ["Cloud", "AWS (EC2, RDS, S3, CloudFront, Amplify), Vercel, Render"],
+  ["AI", "Gemini and other LLM APIs inside real products"],
+];
 
-const easeOut = [0.16, 1, 0.3, 1] as const;
+const ABOUT =
+  "I'm Harsh, a full-stack developer from Akluj, Maharashtra. I take a website from the first sketch to the server it runs on, and I care most about the parts people actually touch: how it loads, how it moves, and whether it gets the client a phone call.";
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: easeOut } },
-};
+/* --------------------------------------------------------------- hooks -- */
 
-const stagger: Variants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
-};
+const ease = [0.16, 1, 0.3, 1] as const;
+const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-function useMediaHover() {
-  const [canHover, setCanHover] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    setCanHover(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setCanHover(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return canHover;
+function useFinePointer() {
+  const [fine, setFine] = useState(false);
+  useEffect(() => setFine(matchMedia("(hover: hover) and (pointer: fine)").matches), []);
+  return fine;
 }
 
-/* ============================================================================
- *  PRIMITIVES
- * ========================================================================== */
-
-function Preloader() {
-  const [gone, setGone] = useState(false);
-  const [progress, setProgress] = useState(0);
-
+function useClock() {
+  const [t, setT] = useState("");
   useEffect(() => {
+    const fmt = new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit" });
+    const tick = () => setT(fmt.format(new Date()));
+    tick();
+    const id = setInterval(tick, 15000);
+    return () => clearInterval(id);
+  }, []);
+  return t;
+}
+
+/* --------------------------------------------------------------- icons -- */
+
+const ROT = { right: 0, "up-right": -45, down: 90, up: -90 } as const;
+
+/** One drawn arrow, rotated per direction: thin stroke, square ends, sharp corner. */
+function Arrow({ dir = "right", className }: { dir?: keyof typeof ROT; className?: string }) {
+  return (
+    <svg className={"ed-ico " + (className ?? "")} viewBox="0 0 24 24" aria-hidden style={{ transform: `rotate(${ROT[dir]}deg)` }}>
+      <path d="M3.5 12H20M13.5 5.5 20 12l-6.5 6.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" strokeLinejoin="miter" />
+    </svg>
+  );
+}
+
+/** Six-spoke asterisk separator (the text asterisk glyph renders as an emoji on phones). */
+function Star() {
+  return (
+    <svg className="ed-star" viewBox="0 0 24 24" aria-hidden>
+      <path d="M12 2v20M3.34 7l17.32 10M3.34 17 20.66 7" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="butt" />
+    </svg>
+  );
+}
+
+/* ---------------------------------------------------------- primitives -- */
+
+function Loader({ onDone }: { onDone: () => void }) {
+  const [n, setN] = useState(0);
+  const [gone, setGone] = useState(false);
+  useEffect(() => {
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const dur = reduce ? 1 : 1100;
+    const t0 = performance.now();
     let raf = 0;
-    const start = performance.now();
-    const DURATION = 1800;
     const tick = (t: number) => {
-      const p = Math.min(1, (t - start) / DURATION);
-      // ease-out cubic
-      const eased = 1 - Math.pow(1 - p, 3);
-      setProgress(eased);
+      const p = Math.min(1, (t - t0) / dur);
+      setN(Math.round(100 * (1 - Math.pow(1 - p, 3))));
       if (p < 1) raf = requestAnimationFrame(tick);
-      else setTimeout(() => setGone(true), 250);
+      else { setGone(true); onDone(); }
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, []);
-
-  const pct = Math.round(progress * 100);
-
-  return (
-    <AnimatePresence>
-      {!gone && (
-        <motion.div
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.7, ease: easeOut } }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-background"
-          style={{ perspective: 1200 }}
-        >
-          {/* aurora ambience */}
-          <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-60">
-            <div className="aurora-blob left-[10%] top-[20%] h-[420px] w-[420px]" style={{ background: "radial-gradient(circle, #6366F1 0%, transparent 70%)" }} />
-            <div className="aurora-blob right-[10%] bottom-[15%] h-[380px] w-[380px]" style={{ background: "radial-gradient(circle, #06B6D4 0%, transparent 70%)", animationDelay: "-6s" }} />
-          </div>
-          <div className="absolute inset-0 grid-bg opacity-40" aria-hidden />
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20, transition: { duration: 0.5 } }}
-            transition={{ duration: 0.7, ease: easeOut }}
-            className="relative z-10 flex flex-col items-center gap-8"
-          >
-            {/* 3D rotating cube monogram */}
-            <div className="relative h-24 w-24" style={{ perspective: 800 }}>
-              {/* orbit ring */}
-              <motion.div
-                className="absolute inset-[-14px] rounded-full border border-white/10"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                style={{
-                  background:
-                    "conic-gradient(from 0deg, transparent 0%, rgba(99,102,241,0.6) 25%, transparent 50%, rgba(6,182,212,0.5) 75%, transparent 100%)",
-                  WebkitMask: "radial-gradient(circle, transparent 58%, black 60%)",
-                  mask: "radial-gradient(circle, transparent 58%, black 60%)",
-                }}
-              />
-              <motion.div
-                className="relative h-full w-full"
-                animate={{ rotateX: [0, 360], rotateY: [0, 360] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                {[
-                  { t: "translateZ(48px)" },
-                  { t: "rotateY(180deg) translateZ(48px)" },
-                  { t: "rotateY(90deg) translateZ(48px)" },
-                  { t: "rotateY(-90deg) translateZ(48px)" },
-                  { t: "rotateX(90deg) translateZ(48px)" },
-                  { t: "rotateX(-90deg) translateZ(48px)" },
-                ].map((f, i) => (
-                  <div
-                    key={i}
-                    className="absolute inset-0 flex items-center justify-center rounded-2xl border border-white/15 font-display text-3xl font-bold text-white"
-                    style={{
-                      transform: f.t,
-                      background:
-                        "linear-gradient(135deg, rgba(99,102,241,0.4), rgba(139,92,246,0.35), rgba(6,182,212,0.35))",
-                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 40px -20px rgba(99,102,241,0.5)",
-                      backdropFilter: "blur(6px)",
-                    }}
-                  >
-                    H
-                  </div>
-                ))}
-              </motion.div>
-            </div>
-
-            <div className="flex flex-col items-center gap-3">
-              <div className="font-display text-sm font-semibold tracking-[0.2em] text-foreground/90">
-                HARSH KSHIRSAGAR
-              </div>
-              <div className="h-[2px] w-56 overflow-hidden rounded-full bg-white/[0.06]">
-                <div
-                  className="h-full rounded-full"
-                  style={{ width: `${pct}%`, background: "var(--gradient-primary)", boxShadow: "0 0 12px rgba(99,102,241,0.6)" }}
-                />
-              </div>
-              <div className="flex w-56 items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                <span>Loading experience</span>
-                <span>{pct.toString().padStart(3, "0")}%</span>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-function CustomCursor() {
-  const canHover = useMediaHover();
-  const outer = useRef<HTMLDivElement>(null);
-  const inner = useRef<HTMLDivElement>(null);
-  const label = useRef<HTMLDivElement>(null);
-  const [variant, setVariant] = useState<"default" | "hover" | "text">("default");
-  const [pressed, setPressed] = useState(false);
-  const [hidden, setHidden] = useState(true);
-  const [labelText, setLabelText] = useState("");
-
-  useEffect(() => {
-    if (!canHover) return;
-    let raf = 0;
-    let mx = 0, my = 0, ox = 0, oy = 0, ix = 0, iy = 0;
-    const move = (e: MouseEvent) => { mx = e.clientX; my = e.clientY; setHidden(false); };
-    const loop = () => {
-      ox += (mx - ox) * 0.18;
-      oy += (my - oy) * 0.18;
-      ix += (mx - ix) * 0.55;
-      iy += (my - iy) * 0.55;
-      if (outer.current) outer.current.style.transform = `translate3d(${ox}px, ${oy}px, 0) translate(-50%, -50%)`;
-      if (inner.current) inner.current.style.transform = `translate3d(${ix}px, ${iy}px, 0) translate(-50%, -50%)`;
-      if (label.current) label.current.style.transform = `translate3d(${ox}px, ${oy + 28}px, 0) translate(-50%, 0)`;
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    window.addEventListener("mousemove", move);
-
-    const over = (e: MouseEvent) => {
-      const t = e.target as HTMLElement | null;
-      const hoverEl = t?.closest("a, button, [role='button'], [data-cursor='hover']") as HTMLElement | null;
-      const textEl = t?.closest("input, textarea, [data-cursor='text']");
-      if (hoverEl) {
-        setVariant("hover");
-        const l = hoverEl.getAttribute("data-cursor-label");
-        setLabelText(l || "");
-      } else if (textEl) {
-        setVariant("text");
-        setLabelText("");
-      } else {
-        setVariant("default");
-        setLabelText("");
-      }
-    };
-    const down = () => setPressed(true);
-    const up = () => setPressed(false);
-    const leave = () => setHidden(true);
-    window.addEventListener("mouseover", over);
-    window.addEventListener("mousedown", down);
-    window.addEventListener("mouseup", up);
-    document.addEventListener("mouseleave", leave);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("mousemove", move);
-      window.removeEventListener("mouseover", over);
-      window.removeEventListener("mousedown", down);
-      window.removeEventListener("mouseup", up);
-      document.removeEventListener("mouseleave", leave);
-    };
-  }, [canHover]);
-
-  if (!canHover) return null;
-
-  const isHover = variant === "hover";
-  const isText = variant === "text";
-  const size = isHover ? 56 : 32;
-  const height = isText ? 26 : size;
-  const width = isText ? 3 : size;
-  const scale = pressed ? 0.85 : 1;
-
-  return (
-    <>
-      <div
-        ref={outer}
-        aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[90] transition-[width,height,background-color,border-color,opacity,border-radius] duration-200 ease-out"
-        style={{
-          width: width * scale,
-          height: height * scale,
-          borderRadius: isText ? 2 : 999,
-          border: isText ? "none" : `1.5px solid ${isHover ? "rgba(56,189,248,0.9)" : "rgba(255,255,255,0.55)"}`,
-          background: isHover ? "rgba(56,189,248,0.15)" : isText ? "rgba(56,189,248,0.95)" : "transparent",
-          opacity: hidden ? 0 : 1,
-          boxShadow: isHover ? "0 0 24px rgba(56,189,248,0.35)" : "none",
-        }}
-      />
-      <div
-        ref={inner}
-        aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[91] rounded-full transition-[width,height,opacity] duration-150"
-        style={{
-          width: isHover || isText ? 0 : 6,
-          height: isHover || isText ? 0 : 6,
-          background: "rgba(56,189,248,1)",
-          boxShadow: "0 0 12px rgba(56,189,248,0.8)",
-          opacity: hidden || isHover || isText ? 0 : 1,
-        }}
-      />
-      {labelText ? (
-        <div
-          ref={label}
-          aria-hidden
-          className="pointer-events-none fixed left-0 top-0 z-[92] whitespace-nowrap rounded-full border border-white/10 bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur"
-          style={{ opacity: hidden ? 0 : 1 }}
-        >
-          {labelText}
-        </div>
-      ) : null}
-    </>
-  );
-}
-
-function ScrollProgress() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.2 });
+  }, [onDone]);
   return (
     <motion.div
-      style={{ scaleX, background: "var(--gradient-primary)", transformOrigin: "0% 50%" }}
-      className="fixed left-0 top-0 z-[80] h-[2px] w-full"
-    />
-  );
-}
-
-function Navbar() {
-  const [open, setOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [active, setActive] = useState<string>("");
-  const lastY = useRef(0);
-
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 40);
-      setHidden(y > lastY.current && y > 300);
-      lastY.current = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    const sections = NAV_LINKS.map((l) => document.querySelector(l.href)).filter(Boolean) as Element[];
-    if (!sections.length) return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) setActive("#" + e.target.id);
-        });
-      },
-      { rootMargin: "-40% 0px -55% 0px" }
-    );
-    sections.forEach((s) => obs.observe(s));
-    return () => obs.disconnect();
-  }, []);
-
-  return (
-    <motion.header
-      initial={{ y: -80 }}
-      animate={{ y: hidden ? -100 : 0 }}
-      transition={{ duration: 0.4, ease: easeOut }}
-      className="fixed inset-x-0 top-4 z-[70] flex justify-center px-4"
+      className="ed-loader"
+      initial={false}
+      animate={gone ? { clipPath: "inset(0 0 100% 0)" } : { clipPath: "inset(0 0 0% 0)" }}
+      transition={{ duration: 0.9, ease: [0.77, 0, 0.18, 1] }}
+      aria-hidden
     >
-      <nav
-        className={`glass-strong flex w-full max-w-4xl items-center justify-between rounded-full px-4 py-2.5 transition-all sm:px-5 ${scrolled ? "shadow-elevated" : ""}`}
-        style={scrolled ? { boxShadow: "var(--shadow-elevated)" } : undefined}
-      >
-        <a href="#top" className="group flex items-baseline gap-0.5" aria-label="Harsh Kshirsagar — home">
-          <span className="font-display text-lg font-bold tracking-tight text-foreground sm:text-xl">harsh</span>
-          <span
-            className="inline-block h-2 w-2 translate-y-[-1px] rounded-full transition-transform duration-300 group-hover:scale-125"
-            style={{ background: "var(--gradient-primary)", boxShadow: "0 0 12px rgba(99,102,241,0.6)" }}
-            aria-hidden
-          />
-        </a>
-        <div className="hidden items-center gap-1 md:flex">
-          {NAV_LINKS.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className={`relative rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                active === l.href ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {active === l.href && (
-                <motion.span
-                  layoutId="nav-active"
-                  className="absolute inset-0 rounded-full bg-white/10"
-                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                />
-              )}
-              <span className="relative z-10">{l.label}</span>
-            </a>
-          ))}
-        </div>
-        <div className="flex items-center gap-2">
-          <a href="#contact" className="btn-primary hidden text-xs sm:inline-flex">
-            Let's talk <ArrowUpRight className="h-3.5 w-3.5" />
-          </a>
-          <button
-            aria-label="Toggle menu"
-            onClick={() => setOpen((v) => !v)}
-            className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5 text-foreground md:hidden"
-          >
-            {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </button>
-        </div>
-      </nav>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.25, ease: easeOut }}
-            className="glass-strong absolute top-[70px] mx-4 w-[calc(100%-2rem)] max-w-4xl rounded-3xl p-4 md:hidden"
-          >
-            <div className="flex flex-col gap-1">
-              {NAV_LINKS.map((l) => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-xl px-4 py-3 text-base font-medium text-foreground/90 hover:bg-white/5"
-                >
-                  {l.label}
-                </a>
-              ))}
-              <a href="#contact" onClick={() => setOpen(false)} className="btn-primary mt-2 w-full">
-                Let's talk <ArrowUpRight className="h-4 w-4" />
-              </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.header>
-  );
-}
-
-function AuroraBackground() {
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className="aurora-blob left-[-10%] top-[-10%] h-[520px] w-[520px]" style={{ background: "radial-gradient(circle, #6366F1 0%, transparent 70%)" }} />
-      <div className="aurora-blob right-[-10%] top-[20%] h-[420px] w-[420px]" style={{ background: "radial-gradient(circle, #8B5CF6 0%, transparent 70%)", animationDelay: "-6s" }} />
-      <div className="aurora-blob bottom-[-10%] left-[30%] h-[500px] w-[500px]" style={{ background: "radial-gradient(circle, #06B6D4 0%, transparent 70%)", animationDelay: "-12s" }} />
-    </div>
-  );
-}
-
-/* ============================================================================
- *  SECTIONS
- * ========================================================================== */
-
-const ROLES = ["MERN / PERN Stack Developer", "AI Agent Builder", "Next.js Specialist", "Voice Chat Integrator"];
-
-function TiltCard({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const canHover = useMediaHover();
-  const [style, setStyle] = useState<React.CSSProperties>({
-    transform: "rotateX(0deg) rotateY(0deg)",
-    transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)",
-  });
-
-  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!canHover || !ref.current) return;
-    const r = ref.current.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width;
-    const py = (e.clientY - r.top) / r.height;
-    const rx = (py - 0.5) * -14;
-    const ry = (px - 0.5) * 14;
-    setStyle({
-      transform: `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`,
-      transition: "transform 0.12s ease-out",
-    });
-  };
-  const onLeave = () =>
-    setStyle({
-      transform: "rotateX(0deg) rotateY(0deg)",
-      transition: "transform 0.7s cubic-bezier(0.16,1,0.3,1)",
-    });
-
-  return (
-    <div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-surface noise will-change-transform"
-      style={{
-        ...style,
-        transformStyle: "preserve-3d",
-        boxShadow: "var(--shadow-elevated)",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function useTypewriter(words: string[]) {
-  const [text, setText] = useState("");
-  const [i, setI] = useState(0);
-  const [del, setDel] = useState(false);
-  useEffect(() => {
-    const current = words[i % words.length];
-    const speed = del ? 40 : 80;
-    const t = setTimeout(() => {
-      if (!del) {
-        const next = current.slice(0, text.length + 1);
-        setText(next);
-        if (next === current) setTimeout(() => setDel(true), 1600);
-      } else {
-        const next = current.slice(0, text.length - 1);
-        setText(next);
-        if (next === "") { setDel(false); setI((v) => v + 1); }
-      }
-    }, speed);
-    return () => clearTimeout(t);
-  }, [text, del, i, words]);
-  return text;
-}
-
-function Hero() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
-  const typed = useTypewriter(ROLES);
-
-  return (
-    <section id="top" ref={containerRef} className="relative isolate overflow-hidden pb-28 pt-32 sm:pt-40">
-      <div className="absolute inset-0 grid-bg" aria-hidden />
-      <AuroraBackground />
-
-      <motion.div style={{ y, opacity }} className="container-page relative">
-        <motion.div variants={stagger} initial="hidden" animate="visible" className="grid items-center gap-14 lg:grid-cols-[1.15fr_0.85fr]">
-          <div>
-            <motion.div variants={fadeUp} className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-subtle backdrop-blur">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
-              </span>
-              Available for opportunities · Remote / Relocate
-            </motion.div>
-
-            <motion.h1 variants={fadeUp} className="hero-heading text-foreground">
-              Building{" "}
-              <span className="relative inline-block">
-                <span className="text-gradient-primary" style={{ backgroundSize: "200% 100%", animation: "hero-shimmer 6s linear infinite" }}>
-                  intelligent
-                </span>
-              </span>
-              <br />
-               AI & Web Products,{" "}
-              <em className="not-italic text-gradient">end-to-end.</em>
-            </motion.h1>
-
-            <motion.p variants={fadeUp} className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              I'm <span className="text-foreground font-medium">Harsh Kshirsagar</span> — a full-stack developer
-              shipping real-time, AI-powered products with Next.js, React, Node.js, MongoDB and the MERN/PERN stack. I also build
-              AI agents and voice chat bots. Currently engineering production experiences for international clients.
-            </motion.p>
-
-            <motion.div variants={fadeUp} className="mt-6 font-mono text-sm text-accent">
-              <span className="text-muted-foreground">$ role &gt;</span> {typed}
-              <span className="caret ml-0.5 inline-block h-4 w-[2px] translate-y-0.5 bg-accent align-middle" />
-            </motion.div>
-
-            {/* KPI pills */}
-            <motion.div variants={fadeUp} className="mt-6 flex flex-wrap gap-2">
-              {[
-                { icon: Rocket, label: "Shipped for international clients" },
-                { icon: Sparkles, label: "AI Agents & Voice Chat" },
-                { icon: Zap, label: "Real-time · MERN/PERN Stack" },
-                { icon: Award, label: "9.1 CGPA" },
-              ].map((k) => (
-                <span key={k.label} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-subtle">
-                  <k.icon className="h-3.5 w-3.5 text-accent" /> {k.label}
-                </span>
-              ))}
-            </motion.div>
-
-            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center gap-3">
-              <a href="#projects" className="btn-primary">View Projects <ArrowRight className="h-4 w-4" /></a>
-              <a href="#contact" className="btn-ghost">Contact Me</a>
-              <a
-                href={resumePdf}
-                download="Harsh_Kshirsagar_Resume.pdf"
-                className="btn-ghost"
-                aria-label="Download resume"
-              >
-                <Download className="h-4 w-4" /> Download Resume
-              </a>
-            </motion.div>
-
-            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4" /> Akluj, Solapur · India</span>
-              <span className="hidden h-4 w-px bg-white/10 sm:block" />
-              <div className="flex items-center gap-3">
-                <a data-cursor="hover" href="https://github.com/harshx-2005" target="_blank" rel="noreferrer" aria-label="GitHub" className="text-muted-foreground transition-colors hover:text-foreground"><Github className="h-4 w-4" /></a>
-                <a data-cursor="hover" href="https://www.linkedin.com/in/harshkshirsagar" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="text-muted-foreground transition-colors hover:text-foreground"><Linkedin className="h-4 w-4" /></a>
-                <a data-cursor="hover" href="mailto:theharshkshirsagar@gmail.com" aria-label="Email" className="text-muted-foreground transition-colors hover:text-foreground"><Mail className="h-4 w-4" /></a>
-                <a data-cursor="hover" href="https://wa.me/917058412735?text=Hi%20Harsh%2C%20I%20saw%20your%20portfolio" target="_blank" rel="noreferrer" aria-label="WhatsApp" className="text-muted-foreground transition-colors hover:text-[#25D366]"><FaWhatsapp className="h-4 w-4" /></a>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Portrait card — 3D tilt + animated conic border */}
-          <motion.div variants={fadeUp} className="relative mx-auto w-full max-w-sm -mt-2 sm:max-w-md sm:-mt-4 lg:-mt-8" style={{ perspective: 1200 }}>
-            <div className="absolute -inset-8 rounded-[2.5rem] opacity-70 blur-3xl" style={{ background: "var(--gradient-subtle)" }} aria-hidden />
-
-            {/* Animated conic gradient ring */}
-            <div className="relative rounded-[2.2rem] p-[1.5px]" aria-hidden>
-              <div
-                className="absolute inset-0 rounded-[2.2rem] opacity-90"
-                style={{
-                  background: "conic-gradient(from 0deg, #6366F1, #8B5CF6, #06B6D4, #6366F1)",
-                  animation: "hero-spin 8s linear infinite",
-                }}
-              />
-              <div className="relative rounded-[2.15rem] bg-background">
-                <TiltCard>
-                  <img
-                    src={heroPortrait}
-                    alt="Portrait of Harsh Kshirsagar, full-stack developer"
-                    width={1024}
-                    height={1280}
-                    className="aspect-[4/5] w-full object-cover"
-                    style={{ transform: "translateZ(40px)" }}
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/60 via-background/5 to-transparent" />
-                  <div
-                    className="pointer-events-none absolute inset-0 opacity-50 mix-blend-overlay"
-                    style={{
-                      background:
-                        "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%)",
-                    }}
-                  />
-                </TiltCard>
-              </div>
-            </div>
-
-            {/* floating chips — visible on mobile too */}
-            <motion.div
-              className="glass-strong absolute -left-3 top-6 rounded-2xl px-2.5 py-1.5 text-[11px] font-medium sm:-left-6 sm:top-8 sm:px-3 sm:py-2 sm:text-xs"
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <span className="mr-1.5 rounded-full bg-primary/25 px-1.5 py-0.5 text-[9px] font-mono text-white sm:mr-2 sm:px-2 sm:text-[10px]">JS</span>
-              JavaScript
-            </motion.div>
-            <motion.div
-              className="glass-strong absolute -right-2 top-1/3 rounded-2xl px-2.5 py-1.5 text-[11px] font-medium sm:-right-4 sm:px-3 sm:py-2 sm:text-xs"
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            >
-              <span className="mr-1.5 rounded-full bg-accent/25 px-1.5 py-0.5 text-[9px] font-mono text-accent sm:mr-2 sm:px-2 sm:text-[10px]">AI</span>
-              AI Agents
-            </motion.div>
-            <motion.div
-              className="glass-strong absolute -left-2 bottom-8 rounded-2xl px-2.5 py-1.5 text-[11px] font-medium sm:-left-4 sm:px-3 sm:py-2 sm:text-xs"
-              animate={{ y: [0, -6, 0] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            >
-              <span className="mr-1.5 rounded-full bg-secondary/30 px-1.5 py-0.5 text-[9px] font-mono text-white sm:mr-2 sm:px-2 sm:text-[10px]">DB</span>
-              PERN Stack
-            </motion.div>
-          </motion.div>
-        </motion.div>
-
-        {/* Scroll cue */}
-        <motion.a
-          href="#about"
-          aria-label="Scroll to about"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.8 }}
-          className="mx-auto mt-16 hidden w-fit flex-col items-center gap-2 text-muted-foreground transition-colors hover:text-foreground sm:flex"
-        >
-          <span className="font-mono text-[10px] uppercase tracking-[0.3em]">Scroll</span>
-          <motion.span
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-            className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[0.03]"
-          >
-            <ChevronDown className="h-4 w-4" />
-          </motion.span>
-        </motion.a>
-      </motion.div>
-    </section>
-  );
-}
-
-const MARQUEE = [
-  "Next.js", "React", "TypeScript", "Node.js", "Express", "MongoDB", "MySQL",
-  "PostgreSQL", "PERN Stack", "Supabase", "Neon", "Firebase", "Real-time APIs", "Tailwind", "Framer Motion", "Gemini AI", "OpenAI",
-  "AI Agents", "Voice Chat", "Django", "Jira",
-];
-
-function TechMarquee() {
-  return (
-    <section aria-label="Technologies" className="relative border-y border-white/5 bg-surface/40 py-6">
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-background to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-background to-transparent" />
-      <div className="marquee-track gap-10">
-        {[...MARQUEE, ...MARQUEE].map((item, i) => (
-          <span key={i} className="whitespace-nowrap font-display text-xl font-medium text-muted-foreground sm:text-2xl">
-            {item}
-            <span className="mx-6 text-accent">✦</span>
-          </span>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function SectionHeader({ eyebrow, title, description }: { eyebrow: string; title: React.ReactNode; description?: string }) {
-  return (
-    <motion.div
-      variants={stagger}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
-      className="mb-14 max-w-3xl"
-    >
-      <motion.div variants={fadeUp} className="eyebrow"><span className="h-px w-8 bg-current opacity-40" />{eyebrow}</motion.div>
-      <motion.h2 variants={fadeUp} className="section-heading mt-4 text-foreground">{title}</motion.h2>
-      {description && (
-        <motion.p variants={fadeUp} className="mt-5 text-base text-muted-foreground sm:text-lg">{description}</motion.p>
-      )}
+      <span className="ed-mono">Harsh Kshirsagar — Portfolio</span>
+      <span className="ed-loader-n">{String(n).padStart(3, "0")}</span>
+      <span className="ed-mono">Issue Nº 01 · 2026</span>
     </motion.div>
   );
 }
 
-function About() {
+function Cursor() {
+  const x = useMotionValue(-100);
+  const y = useMotionValue(-100);
+  const [label, setLabel] = useState("");
+  const [big, setBig] = useState(false);
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    let px = -100, py = -100;
+    // re-read what's under the pointer; scrolling moves content under a still mouse without any pointermove
+    const sync = () => {
+      const hit = document.elementFromPoint(px, py);
+      const el = hit?.closest<HTMLElement>("a, button, [data-cursor]");
+      setBig(!!el);
+      setLabel(el?.dataset.cursor ?? "");
+      // black areas: contact, footer, and index rows (they fill black on hover)
+      setDark(!!hit?.closest(".ed-contact, .ed-foot, .ed-index a"));
+    };
+    const move = (e: PointerEvent) => {
+      px = e.clientX;
+      py = e.clientY;
+      x.set(px);
+      y.set(py);
+      sync();
+    };
+    const leave = (e: PointerEvent) => {
+      if (!e.relatedTarget) { px = py = -100; x.set(-100); y.set(-100); setBig(false); setLabel(""); }
+    };
+    addEventListener("pointermove", move);
+    addEventListener("scroll", sync, { passive: true });
+    document.addEventListener("pointerout", leave);
+    return () => {
+      removeEventListener("pointermove", move);
+      removeEventListener("scroll", sync);
+      document.removeEventListener("pointerout", leave);
+    };
+  }, [x, y]);
   return (
-    <section id="about" className="relative py-28 sm:py-36">
-      <div className="container-page">
-        <SectionHeader
-          eyebrow="About"
-          title={<>Engineer, product-thinker, <span className="text-gradient-primary">builder</span>.</>}
-        />
-
-        <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="surface-card p-8 sm:p-10">
-            <p className="text-lg leading-relaxed text-subtle">
-              Results-driven MERN / PERN stack developer with hands-on experience building real-time, AI-powered web
-              applications and AI agents. Skilled across <span className="text-foreground font-medium">React, Next.js, TypeScript, Node.js, Express, PostgreSQL, MySQL, MongoDB, Supabase, Neon, Firebase, SEO, AI tools, Jira,
-              manual testing, and workflow automation.</span>
-            </p>
-            <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-              I care about scalable architecture, intelligent product surfaces, and continuously improving user
-              experience, product quality and business outcomes — from a first prototype to a production deployment
-              trusted by international clients.
-            </p>
-
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {STATS.map((s) => (
-                <div key={s.label} className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-center">
-                  <div className="font-display text-3xl font-bold text-gradient sm:text-4xl">{s.value}</div>
-                  <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid gap-4 content-start">
-            {[
-              { icon: Rocket, title: "Production-shipped", copy: "Live projects serving real international users, not just demos." },
-              { icon: Sparkles, title: "AI-native workflow", copy: "Gemini, OpenAI and Claude wired into real product surfaces." },
-              { icon: Award, title: "Quality obsessed", copy: "Manual testing, Jira, Agile — I own bugs I introduce." },
-            ].map((c) => (
-              <div key={c.title} className="glass rounded-2xl p-5 glow-hover">
-                <div className="flex items-start gap-4">
-                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/5 text-accent">
-                    <c.icon className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <div className="font-display font-semibold">{c.title}</div>
-                    <div className="text-sm text-muted-foreground">{c.copy}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </div>
-    </section>
+    <motion.div className={"ed-cursor" + (big ? " is-big" : "") + (label ? " has-label" : "") + (dark ? " on-dark" : "")} style={{ x, y }} aria-hidden>
+      <span>{label}</span>
+    </motion.div>
   );
 }
 
-function Skills() {
-  const [active, setActive] = useState<string>("All");
-  const categories = ["All", ...SKILLS.map((s) => s.category)];
-  const visible = useMemo(() => (active === "All" ? SKILLS : SKILLS.filter((s) => s.category === active)), [active]);
-
+/** Nav link whose text rolls up to a copy of itself on hover. */
+function Roll({ href, children, ...rest }: { href: string; children: string } & React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   return (
-    <section id="skills" className="relative py-28 sm:py-36">
-      <div className="container-page">
-        <SectionHeader
-          eyebrow="Skills"
-          title={<>A stack built for <span className="text-gradient-primary">shipping</span>.</>}
-          description="From TypeScript-first frontends to real-time backends and AI-augmented workflows — organized so you can scan by category."
-        />
-
-        <div className="mb-8 flex flex-wrap gap-2">
-          {categories.map((c) => (
-            <button
-              key={c}
-              onClick={() => setActive(c)}
-              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-all ${
-                active === c
-                  ? "border-transparent text-white shadow-[0_10px_30px_-10px_rgba(99,102,241,0.6)]"
-                  : "border-white/10 bg-white/[0.03] text-muted-foreground hover:border-white/25 hover:text-foreground"
-              }`}
-              style={active === c ? { background: "var(--gradient-primary)" } : undefined}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
-          className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          <AnimatePresence mode="popLayout">
-            {visible.map((cat) => (
-              <motion.div
-                layout
-                key={cat.category}
-                variants={fadeUp}
-                initial="hidden"
-                animate="visible"
-                exit={{ opacity: 0, y: 12, transition: { duration: 0.25 } }}
-                className="surface-card group relative overflow-hidden p-6 glow-hover"
-              >
-                <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-70" style={{ background: "var(--gradient-primary)" }} />
-                <div className="relative">
-                  <div className="mb-4 flex items-center justify-between">
-                    <div className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-accent">
-                      <cat.icon className="h-5 w-5" />
-                    </div>
-                    <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      {cat.items.length} skills
-                    </span>
-                  </div>
-                  <h3 className="font-display text-lg font-semibold">{cat.category}</h3>
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {cat.items.map((s) => (
-                      <span key={s} className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-subtle">
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
-      </div>
-    </section>
+    <a href={href} className="ed-roll" {...rest}>
+      <span data-text={children}>{children}</span>
+    </a>
   );
 }
 
-function Experience() {
+function Reveal({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
   return (
-    <section id="experience" className="relative py-28 sm:py-36">
-      <div className="container-page">
-        <SectionHeader
-          eyebrow="Experience"
-          title={<>Where I've <span className="text-gradient-primary">shipped code.</span></>}
-        />
-        <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} className="grid gap-6">
-          {EXPERIENCE.map((e) => (
-            <motion.article
-              key={e.company}
-              variants={fadeUp}
-              className="surface-card grid gap-6 p-6 sm:p-8 lg:grid-cols-[220px_1fr] glow-hover"
-            >
-              <div>
-                <div className="eyebrow"><Briefcase className="h-3.5 w-3.5" /> {e.period}</div>
-                <div className="mt-3 font-display text-xl font-semibold">{e.company}</div>
-                <div className="text-sm text-muted-foreground">{e.role}</div>
-              </div>
-              <ul className="grid gap-3">
-                {e.bullets.map((b) => (
-                  <li key={b} className="flex items-start gap-3 text-sm text-subtle">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.article>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-function ProjectFeatured({ p }: { p: typeof PROJECTS[number] }) {
-  return (
-    <motion.article
-      variants={fadeUp}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
-      className="surface-card group relative overflow-hidden p-4 sm:p-6"
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-10% 0px" }}
+      transition={{ duration: 0.9, ease, delay }}
     >
-      <div className={`pointer-events-none absolute -inset-20 opacity-40 blur-3xl bg-gradient-to-br ${p.accent}`} />
-      <div className="relative grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-center">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10">
-          <img
-            src={p.image}
-            alt={`${p.name} — project screenshot`}
-            width={1600}
-            height={1000}
-            loading="lazy"
-            className="aspect-[16/10] w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]"
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-background/50 via-transparent to-transparent" />
-        </div>
-        <div className="p-2 sm:p-4">
-          <div className="flex flex-wrap items-center gap-2">
-            {p.badges.map((b) => (
-              <span key={b} className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">
-                {b}
-              </span>
-            ))}
-          </div>
-          <h3 className="mt-4 font-display text-3xl font-semibold sm:text-4xl">{p.name}</h3>
-          <div className="mt-1 text-xs text-muted-foreground font-mono">{p.year}</div>
-          <p className="mt-4 text-base text-subtle">{p.tagline}</p>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.description}</p>
-          <div className="mt-5 flex flex-wrap gap-1.5">
-            {p.tech.map((t) => (
-              <span key={t} className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-subtle">{t}</span>
-            ))}
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            {p.live && <a href={p.live} target="_blank" rel="noreferrer" className="btn-primary text-xs">Live site <ExternalLink className="h-3.5 w-3.5" /></a>}
-            {p.repo && <a href={p.repo} target="_blank" rel="noreferrer" className="btn-ghost text-xs">GitHub <Github className="h-3.5 w-3.5" /></a>}
-          </div>
-        </div>
-      </div>
-    </motion.article>
+      {children}
+    </motion.div>
   );
 }
 
-function ProjectCard({ p }: { p: typeof PROJECTS[number] }) {
+/** Each line slides up from behind a mask: when `start` turns true, or when scrolled into view if `start` is omitted. */
+function MaskLines({ lines, className, start, delay = 0 }: { lines: ReactNode[]; className?: string; start?: boolean; delay?: number }) {
   return (
-    <motion.article variants={fadeUp} className="surface-card group relative overflow-hidden glow-hover">
-      <div className="relative overflow-hidden">
-        <img
-          src={p.image}
-          alt={`${p.name} — project screenshot`}
-          width={1600}
-          height={1000}
-          loading="lazy"
-          className="aspect-[16/10] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/80 via-background/10 to-transparent opacity-90" />
-        <div className="absolute left-4 top-4 flex flex-wrap gap-1.5">
-          {p.badges.map((b) => (
-            <span key={b} className="glass rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-foreground/90">{b}</span>
-          ))}
-        </div>
-      </div>
-      <div className="p-6">
-        <div className="flex items-baseline justify-between gap-4">
-          <h3 className="font-display text-xl font-semibold">{p.name}</h3>
-          <span className="font-mono text-[10px] text-muted-foreground">{p.year}</span>
-        </div>
-        <p className="mt-2 text-sm text-muted-foreground">{p.tagline}</p>
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {p.tech.slice(0, 5).map((t) => (
-            <span key={t} className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[11px] text-subtle">{t}</span>
-          ))}
-        </div>
-        <div className="mt-5 flex flex-wrap gap-2">
-          {p.live && <a href={p.live} target="_blank" rel="noreferrer" className="btn-ghost text-xs">Live <ExternalLink className="h-3.5 w-3.5" /></a>}
-          {p.repo && <a href={p.repo} target="_blank" rel="noreferrer" className="btn-ghost text-xs">Code <Github className="h-3.5 w-3.5" /></a>}
-        </div>
-      </div>
-    </motion.article>
+    // the in-view trigger sits on the wrapper: the lines themselves start clipped, so they never "intersect"
+    <motion.span
+      className={"ed-lines " + (className ?? "")}
+      initial="hidden"
+      animate={start ? "show" : undefined}
+      whileInView={start === undefined ? "show" : undefined}
+      viewport={{ once: true }}
+    >
+      {lines.map((l, i) => (
+        <span key={i} className="ed-mask">
+          <motion.span
+            variants={{ hidden: { y: "110%" }, show: { y: "0%" } }}
+            transition={{ duration: 1.1, ease, delay: delay + i * 0.09 }}
+          >
+            {l}
+          </motion.span>
+        </span>
+      ))}
+    </motion.span>
   );
 }
 
-function Projects() {
-  const featured = PROJECTS.find((p) => p.featured)!;
-  const others = PROJECTS.filter((p) => !p.featured);
+/* ---------------------------------------------------------------- hero -- */
+
+function HeroLetter({ ch, i, progress, start }: { ch: string; i: number; progress: MotionValue<number>; start: boolean }) {
+  // letters drift apart at different speeds as the hero scrolls away
+  const speeds = [-60, 40, -110, 70, -30];
+  const y = useTransform(progress, [0, 1], [0, speeds[i % speeds.length] * 3]);
+  const r = useTransform(progress, [0, 1], [0, (i % 2 ? 1 : -1) * 6]);
   return (
-    <section id="projects" className="relative py-28 sm:py-36">
-      <div className="container-page">
-        <SectionHeader
-          eyebrow="Selected work"
-          title={<>Projects that are <span className="text-gradient-primary">live and loved.</span></>}
-          description="Case-studies of real production work — from an international interior design brand to AI-powered internal tools."
-        />
-        <div className="mb-8">
-          <ProjectFeatured p={featured} />
+    <span className="ed-mask ed-hero-l">
+      <motion.span
+        style={{ y, rotate: r, display: "inline-block" }}
+        initial={{ y: "105%" }}
+        animate={start ? { y: 0 } : undefined}
+        transition={{ duration: 1.2, ease, delay: 0.05 * i }}
+      >
+        {ch}
+      </motion.span>
+    </span>
+  );
+}
+
+function Hero({ start }: { start: boolean }) {
+  const ref = useRef<HTMLElement>(null);
+  const nameRef = useRef<HTMLHeadingElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const portraitY = useTransform(scrollYProgress, [0, 1], ["0%", "-25%"]);
+
+  // fit "HARSH" to the full content width
+  useIsoLayoutEffect(() => {
+    const el = nameRef.current;
+    if (!el) return;
+    const fit = () => {
+      el.style.fontSize = "100px";
+      const w = el.scrollWidth;
+      const avail = el.parentElement!.clientWidth;
+      el.style.fontSize = (100 * avail) / w + "px";
+    };
+    fit();
+    document.fonts?.ready.then(fit);
+    const ro = new ResizeObserver(fit);
+    ro.observe(el.parentElement!);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <section ref={ref} className="ed-hero" id="top">
+      <div className="ed-hero-meta ed-mono">
+        <MaskLines start={start} delay={0.5} lines={["Full-stack developer", "Next.js · React · Node · Django"]} />
+        <MaskLines start={start} delay={0.6} lines={["Based in Akluj, India", "Working worldwide"]} />
+        <MaskLines start={start} delay={0.7} lines={[<><i className="ed-dot" /> Available for projects</>, "Freelance & white-label"]} />
+      </div>
+      <h1 ref={nameRef} className="ed-hero-name" aria-label="Harsh Kshirsagar">
+        {"HARSH".split("").map((c, i) => (
+          <HeroLetter key={i} ch={c} i={i} progress={scrollYProgress} start={start} />
+        ))}
+      </h1>
+      <div className="ed-hero-row">
+        <motion.figure
+          className="ed-portrait"
+          initial={{ clipPath: "inset(100% 0 0 0)" }}
+          animate={start ? { clipPath: "inset(0% 0 0 0)" } : undefined}
+          transition={{ duration: 1.3, ease, delay: 0.35 }}
+          data-cursor="Hi"
+        >
+          <motion.img src={portrait} alt="Harsh Kshirsagar" style={{ y: portraitY }} />
+        </motion.figure>
+        <div className="ed-hero-sub">
+          <MaskLines start={start} delay={0.25} className="ed-serif ed-hero-surname" lines={["Kshirsagar"]} />
+          <Reveal delay={0.9} className="ed-hero-lede">
+            <p>
+              I design and build websites that are <em>made for one business</em>, not picked from a template. Code,
+              motion and the server it runs on, all by hand.
+            </p>
+            <a href="#index" className="ed-scroll ed-mono">Scroll to the work <Arrow dir="down" /></a>
+          </Reveal>
         </div>
-        <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} className="grid gap-6 md:grid-cols-2">
-          {others.map((p) => <ProjectCard key={p.id} p={p} />)}
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------ marquee -- */
+
+function VelocityMarquee({ children, base = 40 }: { children: ReactNode; base?: number }) {
+  const reduce = useReducedMotion();
+  const x = useMotionValue(0);
+  const { scrollY } = useScroll();
+  const vel = useSpring(useVelocity(scrollY), { damping: 50, stiffness: 400 });
+  const skew = useTransform(vel, [-2500, 0, 2500], [8, 0, -8], { clamp: true });
+  const dir = useRef(-1);
+  const trackRef = useRef<HTMLDivElement>(null);
+  useAnimationFrame((_, delta) => {
+    if (reduce || !trackRef.current) return;
+    const v = vel.get();
+    if (v < 0) dir.current = 1;
+    else if (v > 0) dir.current = -1;
+    const half = trackRef.current.scrollWidth / 2;
+    let next = x.get() + dir.current * (base + Math.abs(v) / 12) * (delta / 1000);
+    if (next <= -half) next += half;
+    if (next > 0) next -= half;
+    x.set(next);
+  });
+  return (
+    <div className="ed-marquee" aria-hidden>
+      <motion.div ref={trackRef} className="ed-marquee-track" style={{ x, skewX: skew }}>
+        {children}
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------- index -- */
+
+function WorkIndex() {
+  const fine = useFinePointer();
+  const [hover, setHover] = useState<number | null>(null);
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, { stiffness: 160, damping: 20, mass: 0.6 });
+  const sy = useSpring(my, { stiffness: 160, damping: 20, mass: 0.6 });
+  const rot = useTransform(useVelocity(sx), [-1500, 1500], [-10, 10], { clamp: true });
+
+  return (
+    <section className="ed-section" id="index" onPointerMove={(e) => { mx.set(e.clientX); my.set(e.clientY); }}>
+      <header className="ed-head">
+        <span className="ed-mono">Contents</span>
+        <h2>Selected <em className="ed-serif">work</em></h2>
+        <span className="ed-mono">2025 — 2026</span>
+      </header>
+      <ol className="ed-index" onPointerLeave={() => setHover(null)}>
+        {PROJECTS.map((p, i) => (
+          <motion.li
+            key={p.id}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease, delay: i * 0.08 }}
+          >
+            <a href={`#${p.id}`} onPointerEnter={() => setHover(i)} data-cursor="Read">
+              <span className="ed-mono">0{i + 1}</span>
+              <span className="ed-index-name">{p.name}</span>
+              <span className="ed-mono ed-index-kind">{p.kind}</span>
+              <span className="ed-mono">{p.year}</span>
+              <Arrow dir="right" className="ed-index-arrow" />
+            </a>
+          </motion.li>
+        ))}
+      </ol>
+      {fine && (
+        <motion.div className="ed-peek" style={{ x: sx, y: sy, rotate: rot }} aria-hidden>
+          {PROJECTS.map((p, i) => (
+            <motion.img
+              key={p.id}
+              src={p.image}
+              alt=""
+              initial={false}
+              animate={{ clipPath: hover === i ? "inset(0% 0% 0% 0%)" : "inset(50% 50% 50% 50%)", scale: hover === i ? 1 : 1.3 }}
+              transition={{ duration: 0.6, ease }}
+            />
+          ))}
         </motion.div>
-      </div>
+      )}
     </section>
   );
 }
 
-function Education() {
+/* ------------------------------------------------------------ features -- */
+
+function Shot({ src, alt, href }: { src: string; alt: string; href: string }) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
+  const inset = useTransform(scrollYProgress, [0, 1], [14, 0]);
+  const clipPath = useTransform(inset, (v) => `inset(${v}% ${v * 1.4}% ${v}% ${v * 1.4}%)`);
+  const scale = useTransform(scrollYProgress, [0, 1], [1.3, 1]);
   return (
-    <section id="education" className="relative py-28 sm:py-36">
-      <div className="container-page grid gap-14 lg:grid-cols-2">
-        <div>
-          <SectionHeader
-            eyebrow="Education"
-            title={<>Foundations, <span className="text-gradient-primary">not shortcuts.</span></>}
-          />
-          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} className="relative border-l border-white/10 pl-8">
-            {EDUCATION.map((e) => (
-              <motion.div key={e.title} variants={fadeUp} className="relative mb-8 last:mb-0">
-                <span className="absolute -left-[41px] top-1 grid h-6 w-6 place-items-center rounded-full border border-white/10 bg-surface">
-                  <GraduationCap className="h-3 w-3 text-accent" />
-                </span>
-                <div className="eyebrow">{e.period}</div>
-                <div className="mt-2 font-display text-lg font-semibold">{e.title}</div>
-                <div className="text-sm text-muted-foreground">{e.org}</div>
-                <div className="mt-1 text-sm text-accent font-mono">{e.detail}</div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
+    <motion.a ref={ref} href={href} target="_blank" rel="noopener" className="ed-shot" style={{ clipPath }} data-cursor="Visit">
+      <motion.img src={src} alt={alt} style={{ scale }} loading="lazy" />
+    </motion.a>
+  );
+}
 
-        <div>
-          <SectionHeader
-            eyebrow="Certifications"
-            title={<>Certified & <span className="text-gradient-primary">continuously learning.</span></>}
-          />
-          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} className="grid gap-4">
-            {CERTIFICATIONS.map((c) => (
-              <motion.div key={c.name} variants={fadeUp} className="surface-card group flex items-start gap-4 p-6 glow-hover">
-                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/5 text-accent">
-                  <Award className="h-6 w-6" />
-                </div>
-                <div className="flex-1">
-                  <div className="font-display text-base font-semibold">{c.name}</div>
-                  <div className="text-sm text-muted-foreground">{c.issuer} · {c.year}</div>
-                </div>
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
-              </motion.div>
+function Feature({ p, i }: { p: (typeof PROJECTS)[number]; i: number }) {
+  return (
+    <article className={"ed-feature" + (i % 2 ? " is-flip" : "")} id={p.id}>
+      <header className="ed-feature-top">
+        <span className="ed-mono">Feature 0{i + 1}</span>
+        <span className="ed-mono">{p.kind} · {p.year}</span>
+      </header>
+      <h3 className="ed-feature-title">
+        <MaskLines lines={[p.name]} />
+      </h3>
+      <Reveal><p className="ed-serif ed-feature-kicker">{p.kicker}</p></Reveal>
+
+      <div className="ed-feature-media">
+        <Shot src={p.image} alt={`${p.name} website`} href={p.live} />
+      </div>
+
+      <div className="ed-feature-body">
+        <Reveal className="ed-feature-lede"><p className="ed-dropcap">{p.lede}</p></Reveal>
+        <Reveal delay={0.1}>
+          <ol className="ed-notes">
+            {p.notes.map((n, k) => (
+              <li key={k}><span className="ed-mono">{String.fromCharCode(97 + k)}.</span>{n}</li>
             ))}
-          </motion.div>
-        </div>
+          </ol>
+        </Reveal>
+        <Reveal delay={0.2}>
+          <dl className="ed-facts">
+            <dt>Client</dt><dd>{p.client}</dd>
+            <dt>Role</dt><dd>{p.role}</dd>
+            <dt>Stack</dt><dd>{p.stack}</dd>
+          </dl>
+          <div className="ed-links">
+            <a href={p.live} target="_blank" rel="noopener" className="ed-ulink">Live site <Arrow dir="up-right" /></a>
+            <a href={p.repo} target="_blank" rel="noopener" className="ed-ulink">Source <Arrow dir="up-right" /></a>
+          </div>
+        </Reveal>
+      </div>
+
+      <Reveal><blockquote className="ed-serif ed-pull">“{p.quote}”</blockquote></Reveal>
+    </article>
+  );
+}
+
+/* --------------------------------------------------------------- about -- */
+
+function Word({ w, range, progress }: { w: string; range: [number, number]; progress: MotionValue<number> }) {
+  const opacity = useTransform(progress, range, [0.15, 1]);
+  return <motion.span style={{ opacity }}>{w} </motion.span>;
+}
+
+function About() {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 85%", "end 45%"] });
+  const words = ABOUT.split(" ");
+  return (
+    <section className="ed-section" id="about">
+      <header className="ed-head">
+        <span className="ed-mono">Masthead</span>
+        <h2>About <em className="ed-serif">me</em></h2>
+        <a className="ed-mono ed-ulink" href={resumePdf} download="Harsh_Kshirsagar_Resume.pdf">Résumé (PDF) <Arrow dir="down" /></a>
+      </header>
+      <p ref={ref} className="ed-about">
+        {words.map((w, i) => (
+          <Word key={i} w={w} progress={scrollYProgress} range={[i / words.length, (i + 1) / words.length]} />
+        ))}
+      </p>
+      <div className="ed-cols">
+        <Reveal>
+          <h4 className="ed-mono ed-col-h">Experience</h4>
+          {EXPERIENCE.map((e) => (
+            <div className="ed-row" key={e.org}>
+              <span className="ed-mono">{e.when}</span>
+              <div><b>{e.role}</b><span className="ed-muted">{e.org}</span><p>{e.what}</p></div>
+            </div>
+          ))}
+        </Reveal>
+        <Reveal delay={0.1}>
+          <h4 className="ed-mono ed-col-h">Education</h4>
+          {EDUCATION.map((e) => (
+            <div className="ed-row" key={e.org}>
+              <span className="ed-mono">{e.when}</span>
+              <div><b>{e.role}</b><span className="ed-muted">{e.org}</span></div>
+            </div>
+          ))}
+          <h4 className="ed-mono ed-col-h" style={{ marginTop: 48 }}>Toolkit</h4>
+          {TOOLKIT.map(([k, v]) => (
+            <div className="ed-row" key={k}><span className="ed-mono">{k}</span><div><p>{v}</p></div></div>
+          ))}
+        </Reveal>
       </div>
     </section>
   );
 }
+
+/* ------------------------------------------------------------- contact -- */
 
 function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -1221,314 +597,104 @@ function ContactForm() {
     const form = e.currentTarget;
     const data = new FormData(form);
     const name = String(data.get("name") || "");
-    const email = String(data.get("email") || "");
-    const message = String(data.get("message") || "");
-
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           access_key: "c654bbf6-3b1d-4ced-905d-f93318679415",
           name,
-          email,
-          message,
+          email: String(data.get("email") || ""),
+          message: String(data.get("message") || ""),
           subject: `New Portfolio Message from ${name}`,
         }),
       });
-
       const res = await response.json();
-      if (res.success) {
-        setStatus("sent");
-        form.reset();
-      } else {
-        setStatus("error");
-      }
+      if (res.success) { setStatus("sent"); form.reset(); } else setStatus("error");
     } catch (err) {
       console.error(err);
       setStatus("error");
     }
   }
   return (
-    <form onSubmit={onSubmit} className="grid gap-5">
-      {[
-        { name: "name", label: "Your name", type: "text", required: true },
-        { name: "email", label: "Email", type: "email", required: true },
-      ].map((f) => (
-        <label key={f.name} className="group relative block">
-          <input
-            required={f.required}
-            name={f.name}
-            type={f.type}
-            placeholder=" "
-            className="peer w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 pb-2.5 pt-5 text-sm text-foreground outline-none transition-all placeholder:text-transparent focus:border-primary/60 focus:bg-white/[0.05] focus:ring-4 focus:ring-primary/15"
-          />
-          <span className="pointer-events-none absolute left-4 top-3.5 text-xs text-muted-foreground transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs peer-focus:text-accent">
-            {f.label}
-          </span>
-        </label>
-      ))}
-      <label className="group relative block">
-        <textarea
-          required
-          name="message"
-          rows={5}
-          placeholder=" "
-          className="peer w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 pb-2.5 pt-6 text-sm text-foreground outline-none transition-all placeholder:text-transparent focus:border-primary/60 focus:bg-white/[0.05] focus:ring-4 focus:ring-primary/15"
-        />
-        <span className="pointer-events-none absolute left-4 top-3.5 text-xs text-muted-foreground transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs peer-focus:text-accent">
-          Tell me about the project
-        </span>
-      </label>
-      <button type="submit" className="btn-primary self-start" disabled={status === "sending"}>
-        {status === "sent" 
-          ? "Message sent!" 
-          : status === "sending" 
-            ? "Sending..." 
-            : status === "error" 
-              ? "Error - try again" 
-              : "Send message"}
-        <ArrowUpRight className="h-4 w-4" />
+    <form className="ed-form" onSubmit={onSubmit}>
+      <label><span className="ed-mono">Name</span><input name="name" required autoComplete="name" /></label>
+      <label><span className="ed-mono">Email</span><input name="email" type="email" required autoComplete="email" /></label>
+      <label className="is-wide"><span className="ed-mono">Project</span><textarea name="message" rows={3} required /></label>
+      <button type="submit" disabled={status === "sending"} className="ed-send" data-cursor="Send">
+        <span>{status === "sent" ? "Sent. Talk soon." : status === "sending" ? "Sending…" : status === "error" ? "Didn't send. Try again" : "Send message"}</span>
+        <Arrow dir="right" />
       </button>
+      <p className="ed-mono ed-status" role="status" aria-live="polite">
+        {status === "sent" ? "Thanks, I reply within a day." : status === "error" ? `Or email ${EMAIL}` : ""}
+      </p>
     </form>
   );
 }
 
 function Contact() {
   return (
-    <section id="contact" className="relative py-28 sm:py-36">
-      <div className="container-page">
-        <div className="surface-card relative overflow-hidden px-4 py-6 sm:p-12 lg:p-16">
-          <AuroraBackground />
-          <div className="relative grid gap-12 lg:grid-cols-[1fr_1fr]">
-            <div>
-              <div className="eyebrow"><span className="h-px w-8 bg-current opacity-40" />Contact</div>
-              <h2 className="section-heading mt-4 text-foreground">
-                Let's build something{" "}
-                <span className="text-gradient-primary">worth shipping.</span>
-              </h2>
-              <p className="mt-5 text-base text-muted-foreground sm:text-lg">
-                Whether it's a production website, an AI agent, a voice chat bot or a real-time product —
-                I'm currently taking on a small number of new engagements.
-              </p>
-
-              <div className="mt-8 grid gap-3">
-                <a href="mailto:theharshkshirsagar@gmail.com" className="glass flex items-center gap-4 rounded-2xl p-4 glow-hover">
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-accent"><Mail className="h-5 w-5" /></div>
-                  <div className="min-w-0">
-                    <div className="text-xs text-muted-foreground">Email</div>
-                    <div className="truncate font-medium">theharshkshirsagar@gmail.com</div>
-                  </div>
-                </a>
-                <a href="tel:+917058412735" className="glass flex items-center gap-4 rounded-2xl p-4 glow-hover">
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-accent"><Phone className="h-5 w-5" /></div>
-                  <div>
-                    <div className="text-xs text-muted-foreground">Phone</div>
-                    <div className="font-medium">+91 70584 12735</div>
-                  </div>
-                </a>
-                <a href="https://wa.me/917058412735?text=Hi%20Harsh%2C%20I%20saw%20your%20portfolio" target="_blank" rel="noreferrer" className="glass flex items-center gap-4 rounded-2xl p-4 glow-hover">
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#25D366]/15 text-[#25D366]"><FaWhatsapp className="h-5 w-5" /></div>
-                  <div>
-                    <div className="text-xs text-muted-foreground">WhatsApp</div>
-                    <div className="font-medium">Chat on WhatsApp</div>
-                  </div>
-                </a>
-                <div className="glass flex items-center gap-4 rounded-2xl p-4">
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-accent"><MapPin className="h-5 w-5" /></div>
-                  <div>
-                    <div className="text-xs text-muted-foreground">Based in</div>
-                    <div className="font-medium">Akluj, Solapur · India · Available worldwide</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass-strong rounded-3xl p-6 sm:p-8">
-              <ContactForm />
-            </div>
-          </div>
-        </div>
+    <section className="ed-contact" id="contact">
+      <span className="ed-mono">Back page</span>
+      <h2 className="ed-contact-h">
+        <MaskLines lines={["Got a project?", <em className="ed-serif" key="l">Let's talk.</em>]} />
+      </h2>
+      <a className="ed-contact-mail" href={`mailto:${EMAIL}`} data-cursor="Write">{EMAIL}</a>
+      <div className="ed-contact-grid">
+        <ContactForm />
+        <ul className="ed-contact-links">
+          <li><Roll href={LINKEDIN} target="_blank" rel="noopener">LinkedIn</Roll></li>
+          <li><Roll href={GITHUB} target="_blank" rel="noopener">GitHub</Roll></li>
+          <li><Roll href={WHATSAPP} target="_blank" rel="noopener">WhatsApp</Roll></li>
+          <li><Roll href={resumePdf} download="Harsh_Kshirsagar_Resume.pdf">Résumé</Roll></li>
+        </ul>
       </div>
     </section>
   );
 }
 
-function Footer() {
-  const currentYear = new Date().getFullYear();
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
-  return (
-    <footer className="relative overflow-hidden border-t border-white/5 bg-surface/30">
-      <div className="absolute inset-0 grid-bg opacity-50" aria-hidden />
-      <div className="pointer-events-none absolute -top-40 left-1/4 h-80 w-80 rounded-full bg-primary/10 blur-[120px]" aria-hidden />
-      <div className="pointer-events-none absolute -top-40 right-1/4 h-80 w-80 rounded-full bg-accent/10 blur-[120px]" aria-hidden />
-
-      <div className="container-page relative py-16">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
-          {/* Brand */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <span className="relative grid h-10 w-10 place-items-center" aria-hidden>
-                <span
-                  className="absolute inset-0 rounded-full border border-white/10"
-                  style={{ animation: "hero-spin 8s linear infinite" }}
-                />
-                <span
-                  className="absolute h-1.5 w-1.5 rounded-full"
-                  style={{
-                    top: "-2px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    background: "var(--gradient-primary)",
-                    boxShadow: "0 0 10px rgba(6,182,212,0.8)",
-                    transformOrigin: "50% 22px",
-                    animation: "hero-spin 4s linear infinite",
-                  }}
-                />
-                <span className="font-display text-lg font-bold text-foreground">H</span>
-              </span>
-              <div>
-                <p className="font-display text-lg font-semibold text-foreground">Harsh Kshirsagar</p>
-                <p className="text-xs text-muted-foreground">MERN / PERN + AI Agents</p>
-              </div>
-            </div>
-            <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
-              Building intelligent, real-time web products that help teams move faster and users smile more.
-            </p>
-          </div>
-
-          {/* Quick links */}
-          <div className="space-y-4">
-            <h4 className="font-display text-sm font-semibold uppercase tracking-wider text-foreground">Navigate</h4>
-            <ul className="space-y-2">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href}>
-                  <a href={link.href} className="link-underline text-sm text-muted-foreground transition-colors hover:text-foreground">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div className="space-y-4">
-            <h4 className="font-display text-sm font-semibold uppercase tracking-wider text-foreground">Contact</h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="mailto:theharshkshirsagar@gmail.com" className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
-                  <Mail className="h-4 w-4 text-accent" /> theharshkshirsagar@gmail.com
-                </a>
-              </li>
-              <li>
-                <a href="tel:+917058412735" className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
-                  <Phone className="h-4 w-4 text-accent" /> +91 70584 12735
-                </a>
-              </li>
-              <li>
-                <a href="https://wa.me/917058412735?text=Hi%20Harsh%2C%20I%20saw%20your%20portfolio" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground">
-                  <FaWhatsapp className="h-4 w-4 text-[#25D366]" /> WhatsApp
-                </a>
-              </li>
-              <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4 text-accent" /> Akluj, Solapur, India
-              </li>
-            </ul>
-          </div>
-
-          {/* Connect + back to top */}
-          <div className="space-y-4">
-            <h4 className="font-display text-sm font-semibold uppercase tracking-wider text-foreground">Connect</h4>
-            <div className="flex flex-wrap gap-3">
-              <a href="https://github.com/harshx-2005" target="_blank" rel="noreferrer" aria-label="GitHub" className="btn-social">
-                <Github className="h-5 w-5" />
-              </a>
-              <a href="https://www.linkedin.com/in/harshkshirsagar" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="btn-social">
-                <Linkedin className="h-5 w-5" />
-              </a>
-              <a href="https://wa.me/917058412735?text=Hi%20Harsh%2C%20I%20saw%20your%20portfolio" target="_blank" rel="noreferrer" aria-label="WhatsApp" className="btn-social">
-                <FaWhatsapp className="h-5 w-5" />
-              </a>
-              <a href="mailto:theharshkshirsagar@gmail.com" aria-label="Email" className="btn-social">
-                <Mail className="h-5 w-5" />
-              </a>
-            </div>
-            <button
-              onClick={scrollToTop}
-              className="btn-ghost mt-2 w-full text-xs"
-              aria-label="Back to top"
-            >
-              Back to top <ArrowUp className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 sm:flex-row">
-          <p className="text-sm text-muted-foreground">© {currentYear} Harsh Kshirsagar. All rights reserved.</p>
-          <p className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
-            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-success" style={{ boxShadow: "0 0 10px var(--success)" }} />
-            Available for freelance & full-time roles
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-function BackToTop() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 400);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
-  return (
-    <motion.button
-      initial={{ opacity: 0, scale: 0.8, y: 20 }}
-      animate={visible ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
-      transition={{ duration: 0.3, ease: easeOut }}
-      onClick={scrollToTop}
-      aria-label="Back to top"
-      className="fixed bottom-6 right-6 z-[60] grid h-12 w-12 place-items-center rounded-full border border-white/10 bg-white/10 text-foreground shadow-elevated backdrop-blur-xl transition-colors hover:bg-white/15 hover:text-accent focus:outline-none focus:ring-2 focus:ring-primary/50 sm:bottom-8 sm:right-8"
-      style={{ boxShadow: "var(--shadow-elevated)" }}
-    >
-      <ArrowUp className="h-5 w-5" />
-    </motion.button>
-  );
-}
-
-/* ============================================================================
- *  PAGE
- * ========================================================================== */
+/* ---------------------------------------------------------------- page -- */
 
 function PortfolioPage() {
+  const [ready, setReady] = useState(false);
+  const fine = useFinePointer();
+  const clock = useClock();
+  const done = useRef(() => setReady(true)).current;
   return (
-    <div className="relative min-h-screen bg-background text-foreground">
-      <Preloader />
-      <CustomCursor />
-      <ScrollProgress />
-      <Navbar />
+    <div className="ed">
+      <Loader onDone={done} />
+      {fine && <Cursor />}
+      <div className="ed-grid" aria-hidden>{Array.from({ length: 12 }, (_, i) => <i key={i} />)}</div>
+
+      <nav className="ed-nav ed-mono">
+        <a href="#top" className="ed-logo">HK<sup>Nº01</sup></a>
+        <div className="ed-nav-links">
+          <Roll href="#index">Work</Roll>
+          <Roll href="#about">About</Roll>
+          <Roll href="#contact">Contact</Roll>
+        </div>
+        <span className="ed-nav-clock">Akluj {clock}</span>
+      </nav>
+
       <main>
-        <Hero />
-        <TechMarquee />
+        <Hero start={ready} />
+        <VelocityMarquee>
+          <span>Selected work <Star /> Built by hand <Star /> No templates <Star /> Next.js <Star /> Motion <Star />&nbsp;</span>
+        </VelocityMarquee>
+        <WorkIndex />
+        {PROJECTS.map((p, i) => <Feature key={p.id} p={p} i={i} />)}
+        <VelocityMarquee base={30}>
+          <span className="is-outline">Available for work <Star /> Freelance <Star /> White-label <Star />&nbsp;</span>
+        </VelocityMarquee>
         <About />
-        <Skills />
-        <Experience />
-        <Projects />
-        <Education />
         <Contact />
       </main>
-      <Footer />
-      <BackToTop />
+
+      <footer className="ed-foot ed-mono">
+        <span>© {new Date().getFullYear()} Harsh Kshirsagar</span>
+        <span>Set in Archivo &amp; Instrument Serif. Designed and built by hand.</span>
+        <a href="#top" className="ed-ulink">Back to top <Arrow dir="up" /></a>
+      </footer>
     </div>
   );
 }
