@@ -76,7 +76,6 @@ const PROJECTS = [
       "A drag-to-compare before/after slider, because the transformation is the product.",
       "Quote forms that send each lead straight to the owner on WhatsApp.",
     ],
-    quote: "The work is timber and stone, so the website gets out of its way.",
   },
   {
     id: "hirepur",
@@ -96,7 +95,6 @@ const PROJECTS = [
       "Gemini AI resume parsing and candidate-to-job matching.",
       "Real-time Socket.IO notifications plus automated email alerts.",
     ],
-    quote: "Upload a CV once, and the platform does the matching.",
   },
   {
     id: "linkup",
@@ -116,7 +114,6 @@ const PROJECTS = [
       "Audio and video calling built on top of Socket.IO signalling.",
       "An admin dashboard for moderation and content management.",
     ],
-    quote: "One socket carries the chat, the files and the call.",
   },
 ];
 
@@ -216,49 +213,6 @@ function Loader({ onDone }: { onDone: () => void }) {
       <span className="ed-mono">Harsh Kshirsagar — Portfolio</span>
       <span className="ed-loader-n">{String(n).padStart(3, "0")}</span>
       <span className="ed-mono">Issue Nº 01 · 2026</span>
-    </motion.div>
-  );
-}
-
-function Cursor() {
-  const x = useMotionValue(-100);
-  const y = useMotionValue(-100);
-  const [label, setLabel] = useState("");
-  const [big, setBig] = useState(false);
-  const [dark, setDark] = useState(false);
-  useEffect(() => {
-    let px = -100, py = -100;
-    // re-read what's under the pointer; scrolling moves content under a still mouse without any pointermove
-    const sync = () => {
-      const hit = document.elementFromPoint(px, py);
-      const el = hit?.closest<HTMLElement>("a, button, [data-cursor]");
-      setBig(!!el);
-      setLabel(el?.dataset.cursor ?? "");
-      // black areas: contact, footer, and index rows (they fill black on hover)
-      setDark(!!hit?.closest(".ed-contact, .ed-foot, .ed-index a"));
-    };
-    const move = (e: PointerEvent) => {
-      px = e.clientX;
-      py = e.clientY;
-      x.set(px);
-      y.set(py);
-      sync();
-    };
-    const leave = (e: PointerEvent) => {
-      if (!e.relatedTarget) { px = py = -100; x.set(-100); y.set(-100); setBig(false); setLabel(""); }
-    };
-    addEventListener("pointermove", move);
-    addEventListener("scroll", sync, { passive: true });
-    document.addEventListener("pointerout", leave);
-    return () => {
-      removeEventListener("pointermove", move);
-      removeEventListener("scroll", sync);
-      document.removeEventListener("pointerout", leave);
-    };
-  }, [x, y]);
-  return (
-    <motion.div className={"ed-cursor" + (big ? " is-big" : "") + (label ? " has-label" : "") + (dark ? " on-dark" : "")} style={{ x, y }} aria-hidden>
-      <span>{label}</span>
     </motion.div>
   );
 }
@@ -373,7 +327,7 @@ function Hero({ start }: { start: boolean }) {
           initial={{ clipPath: "inset(100% 0 0 0)" }}
           animate={start ? { clipPath: "inset(0% 0 0 0)" } : undefined}
           transition={{ duration: 1.3, ease, delay: 0.35 }}
-          data-cursor="Hi"
+         
         >
           <motion.img src={portrait} alt="Harsh Kshirsagar" style={{ y: portraitY }} />
         </motion.figure>
@@ -381,8 +335,8 @@ function Hero({ start }: { start: boolean }) {
           <MaskLines start={start} delay={0.25} className="ed-serif ed-hero-surname" lines={["Kshirsagar"]} />
           <Reveal delay={0.9} className="ed-hero-lede">
             <p>
-              I design and build websites that are <em>made for one business</em>, not picked from a template. Code,
-              motion and the server it runs on, all by hand.
+              I build websites and web apps from the first layout to the live server. Most recently, a site for{" "}
+              <em>a joinery in Leicester</em>, and Next.js and Django features at WhatBytes.
             </p>
             <a href="#index" className="ed-scroll ed-mono">Scroll to the work <Arrow dir="down" /></a>
           </Reveal>
@@ -450,7 +404,7 @@ function WorkIndex() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease, delay: i * 0.08 }}
           >
-            <a href={`#${p.id}`} onPointerEnter={() => setHover(i)} data-cursor="Read">
+            <a href={`#${p.id}`} onPointerEnter={() => setHover(i)}>
               <span className="ed-mono">0{i + 1}</span>
               <span className="ed-index-name">{p.name}</span>
               <span className="ed-mono ed-index-kind">{p.kind}</span>
@@ -487,7 +441,7 @@ function Shot({ src, alt, href }: { src: string; alt: string; href: string }) {
   const clipPath = useTransform(inset, (v) => `inset(${v}% ${v * 1.4}% ${v}% ${v * 1.4}%)`);
   const scale = useTransform(scrollYProgress, [0, 1], [1.3, 1]);
   return (
-    <motion.a ref={ref} href={href} target="_blank" rel="noopener" className="ed-shot" style={{ clipPath }} data-cursor="Visit">
+    <motion.a ref={ref} href={href} target="_blank" rel="noopener" className="ed-shot" style={{ clipPath }}>
       <motion.img src={src} alt={alt} style={{ scale }} loading="lazy" />
     </motion.a>
   );
@@ -530,8 +484,6 @@ function Feature({ p, i }: { p: (typeof PROJECTS)[number]; i: number }) {
           </div>
         </Reveal>
       </div>
-
-      <Reveal><blockquote className="ed-serif ed-pull">“{p.quote}”</blockquote></Reveal>
     </article>
   );
 }
@@ -621,7 +573,7 @@ function ContactForm() {
       <label><span className="ed-mono">Name</span><input name="name" required autoComplete="name" /></label>
       <label><span className="ed-mono">Email</span><input name="email" type="email" required autoComplete="email" /></label>
       <label className="is-wide"><span className="ed-mono">Project</span><textarea name="message" rows={3} required /></label>
-      <button type="submit" disabled={status === "sending"} className="ed-send" data-cursor="Send">
+      <button type="submit" disabled={status === "sending"} className="ed-send">
         <span>{status === "sent" ? "Sent. Talk soon." : status === "sending" ? "Sending…" : status === "error" ? "Didn't send. Try again" : "Send message"}</span>
         <Arrow dir="right" />
       </button>
@@ -639,7 +591,7 @@ function Contact() {
       <h2 className="ed-contact-h">
         <MaskLines lines={["Got a project?", <em className="ed-serif" key="l">Let's talk.</em>]} />
       </h2>
-      <a className="ed-contact-mail" href={`mailto:${EMAIL}`} data-cursor="Write">{EMAIL}</a>
+      <a className="ed-contact-mail" href={`mailto:${EMAIL}`}>{EMAIL}</a>
       <div className="ed-contact-grid">
         <ContactForm />
         <ul className="ed-contact-links">
@@ -657,13 +609,11 @@ function Contact() {
 
 function PortfolioPage() {
   const [ready, setReady] = useState(false);
-  const fine = useFinePointer();
   const clock = useClock();
   const done = useRef(() => setReady(true)).current;
   return (
     <div className="ed">
       <Loader onDone={done} />
-      {fine && <Cursor />}
       <div className="ed-grid" aria-hidden>{Array.from({ length: 12 }, (_, i) => <i key={i} />)}</div>
 
       <nav className="ed-nav ed-mono">
@@ -679,7 +629,7 @@ function PortfolioPage() {
       <main>
         <Hero start={ready} />
         <VelocityMarquee>
-          <span>Selected work <Star /> Built by hand <Star /> No templates <Star /> Next.js <Star /> Motion <Star />&nbsp;</span>
+          <span>Selected work <Star /> Next.js <Star /> React <Star /> Node <Star /> Django <Star />&nbsp;</span>
         </VelocityMarquee>
         <WorkIndex />
         {PROJECTS.map((p, i) => <Feature key={p.id} p={p} i={i} />)}
@@ -692,7 +642,7 @@ function PortfolioPage() {
 
       <footer className="ed-foot ed-mono">
         <span>© {new Date().getFullYear()} Harsh Kshirsagar</span>
-        <span>Set in Archivo &amp; Instrument Serif. Designed and built by hand.</span>
+        <span>Set in Archivo &amp; Instrument Serif.</span>
         <a href="#top" className="ed-ulink">Back to top <Arrow dir="up" /></a>
       </footer>
     </div>
